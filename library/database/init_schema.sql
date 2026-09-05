@@ -117,3 +117,53 @@ CREATE POLICY "Acceso logueados" ON books FOR ALL USING (auth.role() = 'authenti
 CREATE POLICY "Acceso logueados" ON book_authors FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Acceso logueados" ON book_genres FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Acceso logueados" ON loans FOR ALL USING (auth.role() = 'authenticated');
+
+-- ==========================================
+-- 5. EJEMPLOS
+-- ==========================================
+DO $$
+DECLARE
+  v_author_1 UUID := gen_random_uuid();
+  v_author_2 UUID := gen_random_uuid();
+  
+  v_publisher_1 UUID := gen_random_uuid();
+  v_publisher_2 UUID := gen_random_uuid();
+  
+  v_genre_1 UUID := gen_random_uuid();
+  v_genre_2 UUID := gen_random_uuid();
+  
+  v_series_1 UUID := gen_random_uuid();
+  
+  v_module_1 UUID := gen_random_uuid();
+  v_module_2 UUID := gen_random_uuid();
+  
+  v_book_1 UUID := gen_random_uuid();
+  v_book_2 UUID := gen_random_uuid();
+BEGIN
+  -- 1. Insertar entidades independientes
+  INSERT INTO authors (id, name) VALUES (v_author_1, 'Autor1'), (v_author_2, 'Autor2');
+  INSERT INTO publishers (id, name) VALUES (v_publisher_1, 'Editorial1'), (v_publisher_2, 'Editorial2');
+  INSERT INTO genres (id, name) VALUES (v_genre_1, 'Genero1'), (v_genre_2, 'Genero2');
+  INSERT INTO series (id, name, description) VALUES (v_series_1, 'Saga1', 'Descripción de prueba para Saga1');
+  INSERT INTO shelf_modules (id, name) VALUES (v_module_1, 'Modulo1'), (v_module_2, 'Modulo2');
+
+  -- 2. Insertar Libros
+  -- Libro1: Completo (pertenece a Saga1, Modulo1 y está Disponible)
+  INSERT INTO books (id, title, isbn, year, publisher_id, edition, language, pages, description, status, series_id, position_in_series, module_id) 
+  VALUES (v_book_1, 'Libro1', 'ISBN-0000000001', 2023, v_publisher_1, '1ª Edición', 'Español', 300, 'Descripción ficticia del Libro1', 'Disponible', v_series_1, 1, v_module_1);
+
+  -- Libro2: Suelto (sin saga, Modulo2 y está Prestado)
+  INSERT INTO books (id, title, isbn, year, publisher_id, edition, language, pages, description, status, module_id) 
+  VALUES (v_book_2, 'Libro2', 'ISBN-0000000002', 2024, v_publisher_2, 'Bolsillo', 'Inglés', 450, 'Descripción ficticia del Libro2', 'Prestado', v_module_2);
+
+  -- 3. Conectar relaciones (Muchos a Muchos)
+  INSERT INTO book_authors (book_id, author_id) VALUES (v_book_1, v_author_1);
+  INSERT INTO book_authors (book_id, author_id) VALUES (v_book_2, v_author_2);
+
+  INSERT INTO book_genres (book_id, genre_id) VALUES (v_book_1, v_genre_1);
+  INSERT INTO book_genres (book_id, genre_id) VALUES (v_book_2, v_genre_2);
+
+  -- 4. Registrar préstamo para Libro2
+  INSERT INTO loans (book_id, borrower_name, notes) 
+  VALUES (v_book_2, 'Prestatario1', 'Préstamo de prueba para Libro2');
+END $$;
