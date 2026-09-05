@@ -14,7 +14,7 @@ export default async function Home() {
   const supabase = await createClient();
 
   // 2. Añadimos .returns<BookWithPublisher[]>() al final de la consulta
-  const { data: books, error } = await supabase
+  const { data, error } = await supabase
     .from("books")
     .select(`
       id,
@@ -23,8 +23,9 @@ export default async function Home() {
       cover_url,
       status,
       publishers (name)
-    `)
-    .returns<BookWithPublisher[]>();
+    `);
+
+  const books = data as BookWithPublisher[] | null;
 
   if (error) {
     return (
