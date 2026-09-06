@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 // Definimos el súper-tipo con toda la información anidada
 export type FullBook = {
@@ -30,6 +31,14 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
     <div className="max-w-6xl mx-auto">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Catálogo de Libros</h1>
+        
+        {/* NUEVO BOTÓN */}
+        <Link 
+          href="/new-book" 
+          className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium"
+        >
+          + Nuevo Libro
+        </Link>
       </header>
 
       {/* LISTA PRINCIPAL (Grid de tarjetas resumen) */}
