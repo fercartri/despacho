@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import MultiSelect from '@/components/MultiSelect'
+import SingleSelect from '@/components/SingleSelect'
 import { createBook } from './actions'
 
 type Option = { id: string, name: string }
@@ -17,10 +18,10 @@ type Props = {
 export default function NewBookForm({ authors, genres, publishers, series, shelves }: Props) {
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([])
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
+  const [selectedSeries, setSelectedSeries] = useState<Option | null>(null)
 
   return (
     <form action={createBook} className="flex flex-col gap-8">
-      {/* TRUCO: Guardamos los arrays como texto JSON oculto para enviarlos en el form */}
       <input type="hidden" name="authorIds" value={JSON.stringify(selectedAuthors)} />
       <input type="hidden" name="genreIds" value={JSON.stringify(selectedGenres)} />
 
@@ -30,7 +31,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">Título del libro *</label>
-          <input id="title" name="title" type="text" required className="w-full px-3 py-2 border border-gray-300 rounded-md text-black" />
+          <input id="title" name="title" type="text" required className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -51,31 +52,40 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="publisher_id">Editorial</label>
-            <select id="publisher_id" name="publisher_id" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white">
-              <option value="">-- Sin editorial --</option>
-              {publishers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Editorial</label>
+            <SingleSelect name="publisher_id" options={publishers} placeholder="Buscar editorial..." />
           </div>
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="year">Año</label>
-            <input id="year" name="year" type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black" />
+            <input 
+              id="year" 
+              name="year" 
+              type="text" 
+              inputMode="numeric" 
+              pattern="\d{1,4}" 
+              maxLength={4} 
+              placeholder="Ej: 1998"
+              title="Introduce un año válido (ej: 2024)"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" 
+            />
           </div>
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="isbn">ISBN</label>
-            <input id="isbn" name="isbn" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black" />
+            <input id="isbn" name="isbn" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="language">Idioma</label>
-            <input id="language" name="language" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black" />
+            <input id="language" name="language" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="pages">Nº Páginas</label>
-            <input id="pages" name="pages" type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black" />
+            <input id="pages" name="pages" type="number" min="1" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="edition">Edición (ej: 1ª)</label>
-            <input id="edition" name="edition" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black" />
+            <input id="edition" name="edition" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
         </div>
       </div>
@@ -86,26 +96,41 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="series_id">Saga / Colección</label>
-            <select id="series_id" name="series_id" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white">
-              <option value="">-- Sin saga --</option>
-              {series.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Saga / Colección</label>
+            <SingleSelect 
+              name="series_id" 
+              options={series} 
+              placeholder="Buscar saga..." 
+              onChange={setSelectedSeries} 
+            />
           </div>
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="position_in_series">Volumen en la saga</label>
-            <input id="position_in_series" name="position_in_series" type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black" />
+            <input 
+              id="position_in_series" 
+              name="position_in_series" 
+              type="number" 
+              min="1"
+              disabled={!selectedSeries}
+              placeholder={selectedSeries ? "Ej: 1" : "Selecciona una saga primero"}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors" 
+            />
           </div>
+          
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="shelf_module_id">Ubicación (Estantería)</label>
-            <select id="shelf_module_id" name="shelf_module_id" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white">
-              <option value="">-- Sin asignar --</option>
-              {shelves.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación (Estantería) *</label>
+            <SingleSelect 
+              name="module_id" 
+              options={shelves} 
+              placeholder="Buscar módulo (Obligatorio)..." 
+              required={true}
+            />
           </div>
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="status">Estado actual *</label>
-            <select id="status" name="status" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white font-semibold">
+            <select id="status" name="status" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white font-semibold shadow-sm">
               <option value="Disponible">🟢 Disponible</option>
               <option value="Prestado">🟠 Prestado</option>
             </select>
@@ -113,8 +138,8 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 mt-4" htmlFor="description">Sinopsis / Notas</label>
-          <textarea id="description" name="description" rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black"></textarea>
+          <label className="block text-sm font-medium text-gray-700 mb-1 mt-4" htmlFor="description">Notas</label>
+          <textarea id="description" name="description" rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm"></textarea>
         </div>
       </div>
 

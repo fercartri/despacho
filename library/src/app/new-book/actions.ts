@@ -21,7 +21,7 @@ export async function createBook(formData: FormData) {
   const publisher_id = formData.get('publisher_id') as string || null
   const series_id = formData.get('series_id') as string || null
   const position_in_series = formData.get('position_in_series') ? parseInt(formData.get('position_in_series') as string) : null
-  const shelf_module_id = formData.get('shelf_module_id') as string || null
+  const module_id = formData.get('module_id') as string || null
 
   // 3. Recuperamos y procesamos los arrays de JSON ocultos
   const authorIds: string[] = JSON.parse(formData.get('authorIds') as string || '[]')
@@ -32,7 +32,7 @@ export async function createBook(formData: FormData) {
     .from('books')
     .insert([{
       title, isbn, year, edition, language, pages, description, status,
-      publisher_id, series_id, position_in_series, shelf_module_id
+      publisher_id, series_id, position_in_series, module_id
     }])
     .select('id')
     .single()
