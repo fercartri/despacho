@@ -1,5 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import ActionButtons from '@/components/ActionButtons'
+import { deletePublisher } from '@/app/actions/delete'
 
 export default async function PublishersPage() {
   const supabase = await createClient();
@@ -22,10 +24,18 @@ export default async function PublishersPage() {
         </Link>
       </header>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {publishers?.map((publisher) => (
-          <div key={publisher.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-center text-center h-24 hover:shadow-md transition-shadow">
+          <div key={publisher.id} className="group bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center relative hover:shadow-md transition-shadow">
             <h2 className="font-semibold text-gray-800">{publisher.name}</h2>
+            
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-4">
+              <ActionButtons 
+                id={publisher.id} 
+                editUrl={`/publishers/${publisher.id}/edit`} 
+                deleteAction={deletePublisher}
+              />
+            </div>
           </div>
         ))}
       </div>

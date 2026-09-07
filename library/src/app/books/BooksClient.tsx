@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import ActionButtons from '@/components/ActionButtons'
+import { deleteBook } from '@/app/actions/delete'
 
 // Definimos el súper-tipo con toda la información anidada
 export type FullBook = {
@@ -100,8 +102,16 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
             </div>
 
             {/* Zona Derecha (Todos los detalles) */}
-            <div className="p-8 w-full md:w-2/3">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{selectedBook.title}</h2>
+            <div className="p-8 w-full md:w-2/3 relative">              
+              <div className="flex justify-between items-start mb-2 pr-8">
+                <h2 className="text-3xl font-bold text-gray-900">{selectedBook.title}</h2>
+                <ActionButtons 
+                  id={selectedBook.id} 
+                  editUrl={`/edit-book/${selectedBook.id}`} 
+                  deleteAction={deleteBook}
+                  confirmMessage={`¿Seguro que quieres borrar "${selectedBook.title}" de tu biblioteca?`}
+                />
+              </div>
               <p className="text-xl text-gray-600 mb-6">
                 {selectedBook.book_authors.map(ba => ba.authors?.name).join(', ') || 'Autor desconocido'}
               </p>

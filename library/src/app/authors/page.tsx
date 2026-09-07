@@ -1,5 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import ActionButtons from '@/components/ActionButtons'
+import { deleteAuthor } from '@/app/actions/delete'
 
 export default async function AuthorsPage() {
   const supabase = await createClient();
@@ -21,10 +23,18 @@ export default async function AuthorsPage() {
         </Link>
       </header>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {authors?.map((author) => (
-          <div key={author.id} className="bg-white px-6 py-3 rounded-full shadow-sm border border-gray-100 hover:border-gray-300 transition-colors">
+          <div key={author.id} className="group bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center relative hover:shadow-md transition-shadow">
             <h2 className="font-semibold text-gray-800">{author.name}</h2>
+            
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-4">
+              <ActionButtons 
+                id={author.id} 
+                editUrl={`/authors/${author.id}/edit`} 
+                deleteAction={deleteAuthor}
+              />
+            </div>
           </div>
         ))}
       </div>
