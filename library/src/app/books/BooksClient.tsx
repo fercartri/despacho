@@ -56,7 +56,7 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
   return (
     <div className="max-w-7xl mx-auto">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Catálogo de Libros</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Libros</h1>
         <Link 
           href="/new-book" 
           className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm"

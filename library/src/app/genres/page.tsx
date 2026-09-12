@@ -11,7 +11,7 @@ export default async function GenresPage() {
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Géneros Literarios</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Géneros y Temas</h1>
           <Link 
             href="/genres/new" 
             className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm"
