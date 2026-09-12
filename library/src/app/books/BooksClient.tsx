@@ -27,6 +27,11 @@ export type FullBook = {
 export default function BooksClient({ books }: { books: FullBook[] }) {
   const [selectedBook, setSelectedBook] = useState<FullBook | null>(null)
 
+  const handleDeleteBook = async (id: string) => {
+    await deleteBook(id)
+    setSelectedBook(null)
+  }
+
   return (
     <div className="max-w-7xl mx-auto">
       <header className="flex justify-between items-center mb-8">
@@ -138,7 +143,7 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
                   <ActionButtons 
                     id={selectedBook.id} 
                     editUrl={`/edit-book/${selectedBook.id}`} 
-                    deleteAction={deleteBook}
+                    deleteAction={handleDeleteBook}
                     confirmMessage={`¿Seguro que quieres borrar "${selectedBook.title}" de tu biblioteca?`}
                   />
                 </div>
