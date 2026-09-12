@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteSeries } from '@/app/actions/delete'
+import { SeriesIcon } from '@/components/EntityIcons'
 
 type Book = {
   id: string
@@ -48,9 +49,7 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
             >
               {/* Info de la Saga */}
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-lg shadow-sm">
-                  📚
-                </div>
+                <SeriesIcon />
                 <h2 className="text-xl font-bold text-gray-900">{item.name}</h2>
                 <span className="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold">
                   {item.books.length} {item.books.length === 1 ? 'libro' : 'libros'}

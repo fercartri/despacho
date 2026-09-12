@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import ActionButtons from '@/components/ActionButtons'
 import { deleteGenre } from '@/app/actions/delete'
+import { GenreIcon } from '@/components/EntityIcons'
 
 export default async function GenresPage() {
   const supabase = await createClient();
@@ -25,9 +26,7 @@ export default async function GenresPage() {
             <div key={genre.id} className="group bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center hover:shadow-lg hover:border-gray-300 transition-all h-full">
               
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="w-11 h-11 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0 text-emerald-600 text-lg">
-                  🏷️
-                </div>
+                <GenreIcon />
                 <h2 className="font-semibold text-gray-900 break-words">
                   {genre.name}
                 </h2>

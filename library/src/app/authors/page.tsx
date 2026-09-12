@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import ActionButtons from '@/components/ActionButtons'
 import { deleteAuthor } from '@/app/actions/delete'
+import { AuthorAvatar } from '@/components/EntityIcons'
 
 export default async function AuthorsPage() {
   const supabase = await createClient();
@@ -27,9 +28,7 @@ export default async function AuthorsPage() {
               
               {/* min-w-0 permite que el texto haga salto de línea si es muy largo */}
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="w-11 h-11 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 text-blue-700 font-bold text-lg">
-                  {author.name.charAt(0).toUpperCase()}
-                </div>
+                <AuthorAvatar name={author.name}/>
                 {/* break-words asegura que el texto se adapte y nunca se corte o desborde */}
                 <h2 className="font-semibold text-gray-900 break-words">
                   {author.name}

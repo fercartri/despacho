@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import ActionButtons from '@/components/ActionButtons'
 import { deletePublisher } from '@/app/actions/delete'
+import { PublisherIcon } from '@/components/EntityIcons'
 
 export default async function PublishersPage() {
   const supabase = await createClient();
@@ -25,9 +26,7 @@ export default async function PublishersPage() {
             <div key={publisher.id} className="group bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center hover:shadow-lg hover:border-gray-300 transition-all h-full">
               
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="w-11 h-11 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0 text-indigo-600 text-lg">
-                  🏢
-                </div>
+                <PublisherIcon />
                 <h2 className="font-semibold text-gray-900 break-words">
                   {publisher.name}
                 </h2>

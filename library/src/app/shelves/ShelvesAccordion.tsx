@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteShelf } from '@/app/actions/delete'
+import { ShelfIcon } from '@/components/EntityIcons'
 
 // Definimos la forma de los datos
 type Book = {
@@ -44,9 +45,7 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
             >
               {/* Info del Módulo */}
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-lg shadow-sm">
-                  🗄️
-                </div>
+                <ShelfIcon />
                 <h2 className="text-xl font-bold text-gray-900">{shelf.name}</h2>
                 <span className="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold">
                   {shelf.books.length} {shelf.books.length === 1 ? 'libro' : 'libros'}
