@@ -35,7 +35,6 @@ CREATE TABLE genres (
 CREATE TABLE series (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
-  description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -62,7 +61,7 @@ CREATE TABLE books (
   status TEXT CHECK (status IN ('Disponible', 'Prestado')) DEFAULT 'Disponible',
   
   -- Relaciones 1 a N
-  series_id UUID REFERENCES series(id) ON DELETE SET NULL,
+  series_id UUID REFERENCES series(id) ON DELETE CASCADE,
   position_in_series INTEGER,
   module_id UUID REFERENCES shelf_modules(id) ON DELETE SET NULL,
   
@@ -144,7 +143,7 @@ BEGIN
   INSERT INTO authors (id, name) VALUES (v_author_1, 'Autor1'), (v_author_2, 'Autor2');
   INSERT INTO publishers (id, name) VALUES (v_publisher_1, 'Editorial1'), (v_publisher_2, 'Editorial2');
   INSERT INTO genres (id, name) VALUES (v_genre_1, 'Genero1'), (v_genre_2, 'Genero2');
-  INSERT INTO series (id, name, description) VALUES (v_series_1, 'Saga1', 'Descripción de prueba para Saga1');
+  INSERT INTO series (id, name) VALUES (v_series_1, 'Saga1');
   INSERT INTO shelf_modules (id, name) VALUES (v_module_1, 'Modulo1'), (v_module_2, 'Modulo2');
 
   -- 2. Insertar Libros

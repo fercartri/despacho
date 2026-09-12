@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteBook } from '@/app/actions/delete'
@@ -26,10 +27,30 @@ export type FullBook = {
 
 export default function BooksClient({ books }: { books: FullBook[] }) {
   const [selectedBook, setSelectedBook] = useState<FullBook | null>(null)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  useEffect(() => {
+    const bookId = searchParams.get('bookId')
+    if (bookId) {
+      const bookToOpen = books.find(b => b.id === bookId)
+      if (bookToOpen) {
+        setSelectedBook(bookToOpen)
+      }
+    }
+  }, [searchParams, books])
+
+  const closeModal = () => {
+    setSelectedBook(null)
+    // Si había un bookId en la URL, la limpiamos (así si recargas la página, no se vuelve a abrir solo)
+    if (searchParams.has('bookId')) {
+      router.replace('/books', { scroll: false })
+    }
+  }
 
   const handleDeleteBook = async (id: string) => {
     await deleteBook(id)
-    setSelectedBook(null)
+    closeModal()
   }
 
   return (
@@ -112,12 +133,12 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
 
       {/* EL MODAL (Vista Detalle) */}
       {selectedBook && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gray-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative flex flex-col md:flex-row">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gray-900/60 backdrop-blur-sm" onClick={closeModal}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative flex flex-col md:flex-row" onClick={(e) => e.stopPropagation()}>
             
             {/* Botón de cerrar (X) */}
             <button 
-              onClick={() => setSelectedBook(null)}
+              onClick={() => closeModal()}
               className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 hover:text-gray-900 text-gray-500 transition-colors z-10"
             >
               ✕

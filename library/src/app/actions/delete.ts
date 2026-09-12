@@ -27,3 +27,18 @@ export async function deleteGenre(id: string) {
   await supabase.from('genres').delete().eq('id', id)
   revalidatePath('/genres')
 }
+
+export async function deleteSeries(id: string) {
+  const supabase = await createClient()
+  await supabase.from('series').delete().eq('id', id)
+  
+  revalidatePath('/series')
+  revalidatePath('/books')
+}
+
+export async function deleteShelf(id: string) {
+  const supabase = await createClient()
+  await supabase.from('shelf_modules').delete().eq('id', id)
+  revalidatePath('/shelves')
+  revalidatePath('/books')
+}
