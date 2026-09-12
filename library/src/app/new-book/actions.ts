@@ -23,6 +23,29 @@ export async function createBook(formData: FormData) {
   const position_in_series = formData.get('position_in_series') ? parseInt(formData.get('position_in_series') as string) : null
   const module_id = formData.get('module_id') as string || null
 
+  let cover_url = null
+  const coverFile = formData.get('cover') as File
+
+  // Verificamos si el usuario ha subido un archivo (size > 0)
+  if (coverFile && coverFile.size > 0) {
+    // Generamos un nombre único para que no se sobreescriban fotos con el mismo nombre
+    const fileExtension = coverFile.name.split('.').pop()
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`
+
+    // Subimos la foto al bucket 'covers'
+    const { error: uploadError } = await supabase.storage
+      .from('covers')
+      .upload(fileName, coverFile)
+
+    if (!uploadError) {
+      // Si se subió bien, pedimos la URL pública para guardarla en la base de datos
+      const { data } = supabase.storage.from('covers').getPublicUrl(fileName)
+      cover_url = data.publicUrl
+    } else {
+      console.error("Error subiendo imagen:", uploadError)
+    }
+  }
+
   // 3. Recuperamos y procesamos los arrays de JSON ocultos
   const authorIds: string[] = JSON.parse(formData.get('authorIds') as string || '[]')
   const genreIds: string[] = JSON.parse(formData.get('genreIds') as string || '[]')
@@ -32,14 +55,12 @@ export async function createBook(formData: FormData) {
     .from('books')
     .insert([{
       title, isbn, year, edition, language, pages, description, status,
-      publisher_id, series_id, position_in_series, module_id
+      publisher_id, series_id, position_in_series, module_id, cover_url
     }])
     .select('id')
     .single()
 
-  if (bookError || !newBook) {
-    redirect('/new-book?error=Error al guardar el libro principal')
-  }
+  if (bookError) redirect(`/new-book?error=Error guardando libro: ${bookError.message}`)
 
   const bookId = newBook.id
 

@@ -81,7 +81,11 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
             >
               {/* Portada */}
               <div className="h-56 bg-gray-100 flex items-center justify-center text-gray-400 relative border-b border-gray-100">
-                {book.cover_url ? <span>Portada</span> : (
+                {book.cover_url ? (
+                  // Si hay URL, mostramos la imagen ocupando todo el espacio (object-cover)
+                  <img src={book.cover_url} alt={`Portada de ${book.title}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                ) : (
+                  // Si no hay foto, mostramos el icono por defecto
                   <svg className="w-12 h-12 opacity-20" fill="currentColor" viewBox="0 0 24 24"><path d="M4 19v-14c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2h-14c-1.1 0-2-.9-2-2zm2-14v14h12v-14h-12zm2 2h8v2h-8v-2zm0 4h8v2h-8v-2z"/></svg>
                 )}
                 {/* Etiqueta flotante de estado en la portada */}
@@ -147,7 +151,11 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
             {/* Zona Izquierda (Portada) */}
             <div className="w-full md:w-2/5 bg-gray-50 min-h-[300px] flex flex-col items-center justify-center text-gray-400 p-8 border-r border-gray-100">
               {selectedBook.cover_url ? (
-                <span>Portada completa</span>
+                <img 
+                  src={selectedBook.cover_url} 
+                  alt={`Portada de ${selectedBook.title}`} 
+                  className="w-full max-w-[250px] rounded-md shadow-lg object-contain" 
+                />
               ) : (
                  <div className="w-48 h-72 bg-gray-200 rounded-md shadow-inner flex items-center justify-center border border-gray-300">
                     <span className="text-sm">Sin portada</span>
