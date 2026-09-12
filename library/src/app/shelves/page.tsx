@@ -24,12 +24,9 @@ export default async function ShelvesPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Estanterías y Módulos</h1>
-            <p className="text-gray-500 mt-1">Organización física de tu biblioteca.</p>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900">Estantes y Módulos</h1>
           <Link 
             href="/shelves/new" 
             className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm"
