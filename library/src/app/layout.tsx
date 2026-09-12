@@ -36,7 +36,7 @@ export default async function RootLayout({
                 <Link href="/publishers" className="text-sm font-medium hover:text-gray-300 transition">Editoriales</Link>
                 <Link href="/genres" className="text-sm font-medium hover:text-gray-300 transition">Géneros</Link>
                 <Link href="/series" className="text-sm font-medium hover:text-gray-300 transition">Sagas</Link>
-                <Link href="/shelf-modules" className="text-sm font-medium hover:text-gray-300 transition">Estanterías</Link>
+                <Link href="/shelves" className="text-sm font-medium hover:text-gray-300 transition">Estanterías</Link>
               </div>
             </div>
           </nav>
