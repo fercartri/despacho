@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import imageCompression from 'browser-image-compression'
 import MultiSelect from '@/components/MultiSelect'
 import SingleSelect from '@/components/SingleSelect'
 import { createBook } from './actions'
@@ -19,9 +20,48 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([])
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [selectedSeries, setSelectedSeries] = useState<Option | null>(null)
+  
+  // NUEVO: Estado para saber si el formulario se está enviando
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // NUEVA FUNCIÓN: Intercepta el formulario, comprime la imagen y lo envía
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault() // Evita que la página recargue de golpe
+    setIsSubmitting(true) // Desactiva el botón
+
+    // Recopilamos todos los datos que el usuario ha escrito
+    const formData = new FormData(e.currentTarget)
+    const coverFile = formData.get('cover') as File
+
+    // Si el usuario ha seleccionado una imagen, la comprimimos
+    if (coverFile && coverFile.size > 0) {
+      console.log(`Peso original: ${(coverFile.size / 1024 / 1024).toFixed(2)} MB`)
+      
+      const options = {
+        maxSizeMB: 0.2,          // Límite de 200 KB aprox
+        maxWidthOrHeight: 1200,  // Resolución máxima
+        useWebWorker: true       // Usa el procesador de fondo para no congelar la web
+      }
+
+      try {
+        const compressedFile = await imageCompression(coverFile, options)
+        console.log(`Peso comprimido: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`)
+        
+        // Sobrescribimos la foto original gigante por la comprimida en el FormData
+        formData.set('cover', compressedFile, compressedFile.name)
+      } catch (error) {
+        console.error("Error al comprimir la imagen:", error)
+        // Si fallase la compresión, enviaría la foto original para no interrumpir el proceso
+      }
+    }
+
+    // Finalmente, enviamos los datos procesados a tu base de datos
+    await createBook(formData)
+  }
 
   return (
-    <form action={createBook} className="flex flex-col gap-8">
+    // CAMBIO AQUÍ: Usamos onSubmit={handleSubmit} en lugar de action={createBook}
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8">
       <input type="hidden" name="authorIds" value={JSON.stringify(selectedAuthors)} />
       <input type="hidden" name="genreIds" value={JSON.stringify(selectedGenres)} />
 
@@ -156,8 +196,17 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
         </div>
       </div>
 
-      <button type="submit" className="w-full bg-gray-900 text-white py-4 rounded-xl hover:bg-gray-800 font-bold text-lg shadow-md transition-all">
-        Guardar Libro en la Biblioteca
+      {/* CAMBIO AQUÍ: Botón reactivo al estado de isSubmitting */}
+      <button 
+        type="submit" 
+        disabled={isSubmitting}
+        className={`w-full py-4 rounded-xl font-bold text-lg shadow-md transition-all ${
+          isSubmitting 
+            ? 'bg-gray-400 text-white cursor-not-allowed' 
+            : 'bg-gray-900 text-white hover:bg-gray-800'
+        }`}
+      >
+        {isSubmitting ? 'Procesando imagen y guardando...' : 'Guardar Libro en la Biblioteca'}
       </button>
     </form>
   )
