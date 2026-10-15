@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteShelf } from '@/app/actions/delete'
@@ -23,6 +23,26 @@ type Shelf = {
 export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[] }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
+  useEffect(() => {
+    const shelfIdToOpen = sessionStorage.getItem('openShelfId')
+    
+    if (shelfIdToOpen) {
+      // Abrimos el acordeón
+      setExpanded(prev => ({ ...prev, [shelfIdToOpen]: true }))
+      
+      // Hacemos scroll suave hasta él
+      setTimeout(() => {
+        const element = document.getElementById(`shelf-${shelfIdToOpen}`)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 100)
+
+      // ¡Importante! Borramos el dato de la memoria para que si recargas la página manualmente después, no se vuelva a abrir solo
+      sessionStorage.removeItem('openShelfId')
+    }
+  }, [])
+
   const toggleShelf = (id: string) => {
     setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
   }
@@ -36,7 +56,7 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
         const sortedBooks = [...shelf.books].sort((a, b) => a.title.localeCompare(b.title))
 
         return (
-          <div key={shelf.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/shelf transition-all">
+          <div key={shelf.id} id={`shelf-${shelf.id}`} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/shelf transition-all scroll-mt-24">
             
             {/* CABECERA (Siempre visible) */}
             <div 

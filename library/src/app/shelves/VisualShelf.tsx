@@ -89,7 +89,7 @@ export default function VisualShelf({ shelvesList }: { shelvesList: Shelf[] }) {
                       {bookCount} {bookCount === 1 ? 'libro' : 'libros'}
                     </span>
                   </div>
-                  <Link href="/shelves" className="absolute inset-0 z-10" />
+                  <Link href="/shelves" onClick={() => {sessionStorage.setItem('openShelfId', matchedShelf.id)}} className="absolute inset-0 z-10" />
                 </>
               ) : (
                 <>
