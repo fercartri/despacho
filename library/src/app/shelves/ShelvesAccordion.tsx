@@ -5,7 +5,7 @@ import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteShelf } from '@/app/actions/delete'
 import { ShelfIcon } from '@/components/EntityIcons'
-import { Eye } from 'lucide-react'
+import { ChevronDown, Eye } from 'lucide-react'
 
 // Definimos la forma de los datos
 type Book = {
@@ -28,10 +28,10 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
     const shelfIdToOpen = sessionStorage.getItem('openShelfId')
     
     if (shelfIdToOpen) {
-      // Abrimos el acordeón
+      // Abrir el acordeón
       setExpanded(prev => ({ ...prev, [shelfIdToOpen]: true }))
       
-      // Hacemos scroll suave hasta él
+      // Scroll
       setTimeout(() => {
         const element = document.getElementById(`shelf-${shelfIdToOpen}`)
         if (element) {
@@ -39,7 +39,7 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
         }
       }, 100)
 
-      // ¡Importante! Borramos el dato de la memoria para que si recargas la página manualmente después, no se vuelva a abrir solo
+      // Borrar la memoria para evitar que se abra de nuevo al recargar la página
       sessionStorage.removeItem('openShelfId')
     }
   }, [])
@@ -52,14 +52,12 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
     <div className="flex flex-col gap-4">
       {shelvesList.map((shelf) => {
         const isExpanded = expanded[shelf.id]
-        
-        // Ordenamos los libros alfabéticamente por título para que sea fácil encontrarlos en la estantería
         const sortedBooks = [...shelf.books].sort((a, b) => a.title.localeCompare(b.title))
 
         return (
           <div key={shelf.id} id={`shelf-${shelf.id}`} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/shelf transition-all scroll-mt-24">
             
-            {/* CABECERA (Siempre visible) */}
+            {/* CABECERA*/}
             <div 
               onClick={() => toggleShelf(shelf.id)}
               className="flex justify-between items-center p-5 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -83,17 +81,17 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
                     id={shelf.id} 
                     editUrl={`/shelves/${shelf.id}/edit`} 
                     deleteAction={deleteShelf}
-                    // Recordamos que aquí la base de datos hace SET NULL, así que el borrado es seguro
+
                     confirmMessage={
                       shelf.books.length > 0
-                        ? `¿Seguro que quieres borrar la estantería "${shelf.name}"? Los ${shelf.books.length} libros que contiene quedarán sin ubicación asignada.`
-                        : `¿Seguro que quieres borrar la estantería "${shelf.name}"? Está vacía.`
+                        ? `¿Seguro que quieres borrar la estantería "${shelf.name}"? Los ${shelf.books.length} libros que contiene quedarán sin ubicación asignada`
+                        : `¿Seguro que quieres borrar la estantería "${shelf.name}"?`
                     }
                   />
                 </div>
                 
                 <div className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                  ▼
+                  <ChevronDown />
                 </div>
               </div>
             </div>
@@ -104,7 +102,6 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
                 {sortedBooks.length > 0 ? (
                   <ul className="divide-y divide-gray-100">
                     {sortedBooks.map((book) => {
-                      // Extraemos los nombres de los autores
                       const authorNames = book.book_authors
                         .map((ba) => ba.authors?.name)
                         .filter(Boolean)
@@ -126,8 +123,7 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
                               {book.status}
                             </span>
                             
-                            {/* Botón del OJO mágico */}
-                            <Link 
+                            <Link
                               href={`/books?bookId=${book.id}`}
                               className="p-2 text-gray-900 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                               title="Ver detalles completos del libro"
