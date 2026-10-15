@@ -6,9 +6,8 @@ import { redirect } from 'next/navigation'
 export async function signOut() {
   const supabase = await createClient()
   
-  // Esto destruye la sesión en Supabase y borra las cookies de tu navegador
+  // Cerrar sesión y borrar cookies
   await supabase.auth.signOut()
   
-  // Te manda de vuelta al login
   redirect('/login')
 }

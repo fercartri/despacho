@@ -6,14 +6,14 @@ import { revalidatePath } from 'next/cache'
 export async function deleteBook(id: string) {
   const supabase = await createClient()
 
-  // 1. BUSCAR LA FOTO: Primero pedimos el libro para ver si tiene URL de portada
+  // Buscar la foto
   const { data: book } = await supabase
     .from('books')
     .select('cover_url')
     .eq('id', id)
     .single()
 
-  // 2. BORRAR LA FOTO: Si tiene foto, la eliminamos de Supabase Storage
+  // Borrar la foto
   if (book && book.cover_url) {
     const fileName = book.cover_url.split('/').pop()
     
@@ -28,7 +28,7 @@ export async function deleteBook(id: string) {
     }
   }
 
-  // 3. BORRAR EL LIBRO: Ahora sí, eliminamos el registro de la base de datos
+  // Borrar el libro
   const { error } = await supabase
     .from('books')
     .delete()
@@ -39,9 +39,9 @@ export async function deleteBook(id: string) {
     throw new Error('No se pudo borrar el libro')
   }
 
-  // 4. REFRESCA LAS VISTAS
-  revalidatePath('/books') // Refresca el catálogo
-  revalidatePath('/')      // Refresca el Dashboard de la página principal
+  // Refrescar
+  revalidatePath('/books')
+  revalidatePath('/')
 }
 
 export async function deleteAuthor(id: string) {
