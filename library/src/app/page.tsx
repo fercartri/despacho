@@ -54,7 +54,7 @@ export default async function HomePage() {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
             <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center"><Book /></div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Total de Libros</p>
+              <p className="text-sm font-medium text-gray-500">Total de libros</p>
               <p className="text-2xl font-bold text-gray-900">{totalBooks || 0}</p>
             </div>
           </div>
@@ -62,7 +62,7 @@ export default async function HomePage() {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
             <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center"><UserCheck /></div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Libros Prestados</p>
+              <p className="text-sm font-medium text-gray-500">Libros prestados</p>
               <p className="text-2xl font-bold text-gray-900">{loanedBooks || 0}</p>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default async function HomePage() {
         {/* ESTANTERÍA VISUAL */}
         <section>
           <div className="flex justify-between items-end mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Mapa del Mueble Principal</h2>
+            <h2 className="text-xl font-bold text-gray-900">Estantería principal</h2>
             <Link href="/shelves" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Gestionar estanterías</Link>
           </div>
           <VisualShelf shelvesList={shelvesData || []} />
@@ -80,7 +80,7 @@ export default async function HomePage() {
         {/* ÚLTIMOS LIBROS AÑADIDOS */}
         <section>
           <div className="flex justify-between items-end mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Últimas Incorporaciones</h2>
+            <h2 className="text-xl font-bold text-gray-900">Últimos libros añadidos</h2>
             <Link href="/books" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Catálogo completo</Link>
           </div>
           
