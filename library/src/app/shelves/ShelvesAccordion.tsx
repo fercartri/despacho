@@ -129,10 +129,10 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
                             {/* Botón del OJO mágico */}
                             <Link 
                               href={`/books?bookId=${book.id}`}
-                              className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                              className="p-2 text-gray-900 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                               title="Ver detalles completos del libro"
                             >
-                              <span className="text-grey-900"><Eye /></span>
+                              <Eye />
                             </Link>
                           </div>
 
