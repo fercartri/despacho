@@ -5,6 +5,7 @@ import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteShelf } from '@/app/actions/delete'
 import { ShelfIcon } from '@/components/EntityIcons'
+import { Eye } from 'lucide-react'
 
 // Definimos la forma de los datos
 type Book = {
@@ -131,7 +132,7 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
                               className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                               title="Ver detalles completos del libro"
                             >
-                              👁️
+                              <span className="text-grey-900"><Eye /></span>
                             </Link>
                           </div>
 
