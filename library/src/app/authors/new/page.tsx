@@ -1,3 +1,4 @@
+import { ChevronLeft } from 'lucide-react';
 import { createAuthor } from './actions'
 import Link from 'next/link'
 
@@ -12,9 +13,9 @@ export default async function NewAuthorPage({
     <main className="p-8 max-w-2xl mx-auto">
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Añadir Nuevo Autor</h1>
-          <Link href="/authors" className="text-sm text-gray-500 hover:text-gray-900">
-            ← Volver a autores
+          <h1 className="text-2xl font-bold text-gray-900">Añadir nuevo autor</h1>
+          <Link href="/authors" className="text-sm text-gray-500 hover:text-gray-900 flex items-center gap-1">
+            <ChevronLeft /> Volver a autores
           </Link>
         </header>
 
@@ -40,7 +41,7 @@ export default async function NewAuthorPage({
           </div>
 
           <button type="submit" className="w-full bg-gray-900 text-white py-3 rounded-md hover:bg-gray-800">
-            Guardar Autor
+            Guardar autor
           </button>
         </form>
       </div>
