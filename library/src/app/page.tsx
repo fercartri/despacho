@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
-import { Book, Archive, UserCheck, Clock } from "lucide-react";
+import { Book, UserCheck } from "lucide-react";
 import VisualShelf from "@/app/shelves/VisualShelf"; // ¡Llamamos a tu componente!
 
 export default async function HomePage() {
@@ -46,8 +46,7 @@ export default async function HomePage() {
         
         {/* CABECERA */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Resumen de tu Biblioteca</h1>
-          <p className="text-gray-500 mt-1">Bienvenido de nuevo. Aquí tienes un vistazo a tu colección.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Biblioteca</h1>
         </div>
 
         {/* 4 TARJETAS DE ESTADÍSTICAS (Grid) */}
@@ -67,31 +66,14 @@ export default async function HomePage() {
               <p className="text-2xl font-bold text-gray-900">{loanedBooks || 0}</p>
             </div>
           </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
-            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center"><Archive /></div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Huecos en Uso</p>
-              <p className="text-2xl font-bold text-gray-900">{totalShelves || 0} / 25</p>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
-            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center"><Clock /></div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Última Actividad</p>
-              <p className="text-sm font-bold text-gray-900 mt-1">Hoy</p>
-            </div>
-          </div>
         </div>
 
         {/* ESTANTERÍA VISUAL */}
         <section>
           <div className="flex justify-between items-end mb-4">
             <h2 className="text-xl font-bold text-gray-900">Mapa del Mueble Principal</h2>
-            <Link href="/shelves" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Gestionar huecos →</Link>
+            <Link href="/shelves" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Gestionar estanterías</Link>
           </div>
-          {/* ¡AQUÍ INYECTAMOS TU COMPONENTE DE LA ESTANTERÍA! */}
           <VisualShelf shelvesList={shelvesData || []} />
         </section>
 
@@ -99,17 +81,14 @@ export default async function HomePage() {
         <section>
           <div className="flex justify-between items-end mb-4">
             <h2 className="text-xl font-bold text-gray-900">Últimas Incorporaciones</h2>
-            <Link href="/books" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Ir al catálogo completo →</Link>
+            <Link href="/books" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Catálogo completo</Link>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {/* 1. Forzamos a que recentBooks sea 'any' para apagar los errores de TypeScript */}
             {(recentBooks as any[])?.map((book) => {
               
-              // 2. Extraemos la información del autor
               const authorsData = book?.book_authors?.[0]?.authors;
-              
-              // 3. Comprobamos de forma segura si es una lista (array) o un objeto simple
+
               const author = Array.isArray(authorsData) 
                 ? authorsData[0]?.name 
                 : authorsData?.name || 'Desconocido';

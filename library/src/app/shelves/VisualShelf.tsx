@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Plus, BookCopy } from "lucide-react";
 
 type Shelf = {
   id: string
@@ -83,13 +84,12 @@ export default function VisualShelf({ shelvesList }: { shelvesList: Shelf[] }) {
                 <>
                   {/* Hueco enlazado con la BD */}
                   <div className="flex flex-col items-center justify-center">
-                    <span className="text-2xl mb-1">{isEmpty ? '➕' : '📚'}</span>
+                    <span className="text-2xl mb-1 text-gray-900">{isEmpty ? <Plus /> : <BookCopy />}</span>
                     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${isEmpty ? 'bg-gray-200 text-gray-500' : 'bg-amber-200 text-amber-800'}`}>
                       {bookCount} {bookCount === 1 ? 'libro' : 'libros'}
                     </span>
                   </div>
-                  {/* Hacer clic aquí podría bajar al acordeón de abajo, o abrir detalles */}
-                  <Link href={`#shelf-${matchedShelf.id}`} className="absolute inset-0 z-10" />
+                  <Link href="/shelves" className="absolute inset-0 z-10" />
                 </>
               ) : (
                 <>
