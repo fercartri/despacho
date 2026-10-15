@@ -89,9 +89,10 @@ export default async function HomePage() {
               
               const authorsData = book?.book_authors?.[0]?.authors;
 
-              const author = Array.isArray(authorsData) 
-                ? authorsData[0]?.name 
-                : authorsData?.name || 'Desconocido';
+              const author = book?.book_authors
+                ?.map((ba: any) => ba?.authors?.name)
+                .filter(Boolean)
+                .join(', ') || 'Autor desconocido';
               
               return (
                 <Link href={`/books?bookId=${book.id}`} key={book.id} className="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all">
