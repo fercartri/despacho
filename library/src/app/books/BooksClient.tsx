@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteBook } from '@/app/actions/delete'
-import { Plus, MapPin, Tag, Library } from 'lucide-react'
+import { Plus, MapPin, Tag, Library, X } from 'lucide-react'
 
 export type FullBook = {
   id: string
@@ -147,21 +147,21 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
               onClick={() => closeModal()}
               className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 hover:text-gray-900 text-gray-500 transition-colors z-10"
             >
-              ✕
+              <X className="w-4 h-4" />
             </button>
 
             {/* Zona Izquierda (Portada) */}
-            <div className="w-full md:w-2/5 bg-gray-50 min-h-[300px] flex flex-col items-center justify-center text-gray-400 p-8 border-r border-gray-100">
+            <div className="w-full md:w-2/5 bg-gray-50 flex flex-col items-center justify-center text-gray-400 p-8 border-r border-gray-100 md:min-h-full">
               {selectedBook.cover_url ? (
                 <img 
                   src={selectedBook.cover_url} 
                   alt={`Portada de ${selectedBook.title}`} 
-                  className="w-full max-w-[250px] rounded-md shadow-lg object-contain" 
+                  className="w-full max-h-[70vh] rounded-md shadow-lg object-contain my-auto" 
                 />
               ) : (
-                 <div className="w-48 h-72 bg-gray-200 rounded-md shadow-inner flex items-center justify-center border border-gray-300">
+                <div className="w-48 h-72 bg-gray-200 rounded-md shadow-inner flex items-center justify-center border border-gray-300 my-auto">
                     <span className="text-sm">Sin portada</span>
-                 </div>
+                </div>
               )}
             </div>
 
