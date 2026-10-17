@@ -12,14 +12,24 @@ type Props = {
   name: string
   placeholder?: string
   required?: boolean
+  defaultValue?: string
   onChange?: (opt: Option | null) => void
 }
 
-export default function SingleSelect({ options, name, placeholder = "Buscar...", required = false, onChange }: Props) {
+export default function SingleSelect({ options, name, placeholder = "Buscar...", required = false, defaultValue, onChange }: Props) {
   const [search, setSearch] = useState('')
   const [selectedOption, setSelectedOption] = useState<Option | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (defaultValue) {
+      const found = options.find(opt => opt.id === defaultValue)
+      if (found) {
+        setSelectedOption(found)
+      }
+    }
+  }, [defaultValue, options])
 
   const filteredOptions = options.filter(opt => 
     opt.name.toLowerCase().includes(search.toLowerCase())
