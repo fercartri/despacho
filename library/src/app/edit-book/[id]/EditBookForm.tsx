@@ -5,6 +5,7 @@ import imageCompression from 'browser-image-compression'
 import MultiSelect from '@/components/MultiSelect'
 import SingleSelect from '@/components/SingleSelect'
 import { updateBook } from './actions'
+import { Check, X } from 'lucide-react'
 
 type Option = { id: string, name: string }
 
@@ -80,12 +81,12 @@ export default function EditBookForm({ book, authors, genres, publishers, series
       <input type="hidden" name="genreIds" value={JSON.stringify(selectedGenres)} />
       <input type="hidden" name="existing_cover_url" value={book.cover_url || ''} />
 
-      {/* BLOQUE 1: Información Principal */}
+      {/* BLOQUE 1: Información principal */}
       <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-4">
         <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Información principal</h2>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">Título del libro *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">Título *</label>
           <input 
             id="title" 
             name="title" 
@@ -98,12 +99,12 @@ export default function EditBookForm({ book, authors, genres, publishers, series
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="cover">
-            Portada del libro
+            Portada (Imagen)
           </label>
           {book.cover_url && (
             <div className="mb-3 flex items-center gap-4 bg-white p-3 rounded-lg border border-gray-200">
               <img src={book.cover_url} alt="Portada actual" className="w-12 h-16 object-cover rounded shadow-sm" />
-              <span className="text-xs text-gray-500">Portada actual guardada. Sube un nuevo archivo solo si deseas reemplazarla</span>
+              <span className="text-xs text-gray-500">Portada actual. Sube una nueva imagen para reemplazarla</span>
             </div>
           )}
           <input 
@@ -127,7 +128,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
         </div>
       </div>
 
-      {/* BLOQUE 2: Edición y Publicación */}
+      {/* BLOQUE 2: Detalles de edición y publicación */}
       <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-4">
         <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Edición y publicación</h2>
         
@@ -147,31 +148,31 @@ export default function EditBookForm({ book, authors, genres, publishers, series
               pattern="\d{1,4}" 
               maxLength={4} 
               defaultValue={book.year || ''}
-              placeholder="Ej: 1998"
+              placeholder="Ej: 1973"
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" 
             />
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="isbn">ISBN</label>
-            <input id="isbn" name="isbn" type="text" defaultValue={book.isbn || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
+            <input id="isbn" name="isbn" type="text" defaultValue={book.isbn || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" placeholder="Ej: 978-8478884452" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="language">Idioma</label>
-            <input id="language" name="language" type="text" defaultValue={book.language || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
+            <input id="language" name="language" type="text" defaultValue={book.language || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" placeholder="Ej: Español" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="pages">Nº páginas</label>
-            <input id="pages" name="pages" type="number" min="1" defaultValue={book.pages || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
+            <input id="pages" name="pages" type="number" min="1" defaultValue={book.pages || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" placeholder="Ej: 256" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="edition">Edición (ej: 1ª)</label>
-            <input id="edition" name="edition" type="text" defaultValue={book.edition || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="edition">Edición</label>
+            <input id="edition" name="edition" type="text" defaultValue={book.edition || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" placeholder="Ej: 1ª" />
           </div>
         </div>
       </div>
 
-      {/* BLOQUE 3: Clasificación y Estado */}
+      {/* BLOQUE 3: Clasificación y estado */}
       <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-4">
         <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Organización</h2>
         
@@ -215,8 +216,8 @@ export default function EditBookForm({ book, authors, genres, publishers, series
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="status">Estado actual *</label>
             <select id="status" name="status" defaultValue={book.status} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white font-semibold shadow-sm">
-              <option value="Disponible">🟢 Disponible</option>
-              <option value="Prestado">🟠 Prestado</option>
+              <option value="Disponible"><Check className="text-green-500" /> Disponible</option>
+              <option value="Prestado"><X className="text-red-500" /> Prestado</option>
             </select>
           </div>
         </div>
@@ -236,7 +237,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
             : 'bg-indigo-600 text-white hover:bg-indigo-700'
         }`}
       >
-        {isSubmitting ? 'Guardando cambios...' : 'Actualizar libro'}
+        {isSubmitting ? 'Guardando cambios...' : 'Guardar libro'}
       </button>
     </form>
   )
