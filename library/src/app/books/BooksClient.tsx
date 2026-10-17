@@ -109,8 +109,11 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
                 
                 <div className="mt-auto space-y-2">
                   {book.series?.name && (
-                    <p className="text-xs text-indigo-700 font-medium bg-indigo-50 inline-block px-2 py-0.5 rounded-md line-clamp-1 flex items-center gap-1">
-                      <Library className="w-4 h-4" /> {book.series.name} {book.position_in_series ? `(#${book.position_in_series})` : ''}
+                    <p className="text-xs text-indigo-700 font-medium bg-indigo-50 inline-flex items-center gap-1 px-2 py-0.5 rounded-md max-w-full">
+                      <Library className="w-4 h-4 flex-shrink-0" /> 
+                      <span className="truncate">
+                        {book.series.name} {book.position_in_series ? `(#${book.position_in_series})` : ''}
+                      </span>
                     </p>
                   )}
                   
