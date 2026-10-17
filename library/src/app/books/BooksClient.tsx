@@ -218,7 +218,8 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
                 </div>
                 <div>
                   <p className="text-gray-400 font-medium text-xs uppercase tracking-wider mb-1">Año de edición</p>
-                  <p className="text-gray-900">{selectedBook.year || '-'} {selectedBook.edition ? `(${selectedBook.edition})` : ''}</p>
+                  <p className="text-gray-900">
+                    {selectedBook.year || 'Año N/D'} • {selectedBook.edition ? `${selectedBook.edition} edición` : 'Edición N/D'}</p>
                 </div>
                 <div>
                   <p className="text-gray-400 font-medium text-xs uppercase tracking-wider mb-1">Detalles técnicos</p>
