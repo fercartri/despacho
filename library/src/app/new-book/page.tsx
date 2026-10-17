@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import NewBookForm from './NewBookForm'
+import { X } from 'lucide-react'
 
 export default async function NewBookPage({
   searchParams
@@ -31,11 +32,10 @@ export default async function NewBookPage({
         
         <header className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Añadir Nuevo Libro</h1>
-            <p className="text-gray-500 mt-1">Registra un ejemplar y categorízalo en tu biblioteca.</p>
+            <h1 className="text-3xl font-bold text-gray-900">Añadir nuevo libro</h1>
           </div>
           <Link href="/books" className="text-sm font-medium text-gray-500 hover:text-gray-900 bg-gray-100 px-4 py-2 rounded-lg transition-colors">
-            ✕ Cancelar
+            <X /> Cancelar
           </Link>
         </header>
 

@@ -82,7 +82,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
 
       {/* BLOQUE 1: Información Principal */}
       <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-4">
-        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Información Principal</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Información principal</h2>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">Título del libro *</label>
@@ -103,7 +103,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
           {book.cover_url && (
             <div className="mb-3 flex items-center gap-4 bg-white p-3 rounded-lg border border-gray-200">
               <img src={book.cover_url} alt="Portada actual" className="w-12 h-16 object-cover rounded shadow-sm" />
-              <span className="text-xs text-gray-500">Portada actual guardada. Sube un nuevo archivo solo si deseas reemplazarla.</span>
+              <span className="text-xs text-gray-500">Portada actual guardada. Sube un nuevo archivo solo si deseas reemplazarla</span>
             </div>
           )}
           <input 
@@ -129,7 +129,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
 
       {/* BLOQUE 2: Edición y Publicación */}
       <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-4">
-        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Edición y Publicación</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Edición y publicación</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -161,11 +161,11 @@ export default function EditBookForm({ book, authors, genres, publishers, series
             <input id="language" name="language" type="text" defaultValue={book.language || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="pages">Nº Páginas</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="pages">Nº páginas</label>
             <input id="pages" name="pages" type="number" min="1" defaultValue={book.pages || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="edition">Edición</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="edition">Edición (ej: 1ª)</label>
             <input id="edition" name="edition" type="text" defaultValue={book.edition || ''} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación (Estantería) *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación (estantería) *</label>
             <SingleSelect 
               name="module_id" 
               options={shelves} 
@@ -236,7 +236,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
             : 'bg-indigo-600 text-white hover:bg-indigo-700'
         }`}
       >
-        {isSubmitting ? 'Guardando cambios...' : 'Actualizar Libro'}
+        {isSubmitting ? 'Guardando cambios...' : 'Actualizar libro'}
       </button>
     </form>
   )

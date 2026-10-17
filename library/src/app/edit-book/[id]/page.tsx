@@ -52,10 +52,10 @@ export default async function EditBookPage({
         <header className="flex justify-between items-center mb-8">
           <div>
             <Link href="/books" className="text-sm text-gray-500 hover:text-gray-900 flex items-center gap-1.5 mb-2 transition-colors">
-              <ChevronLeft className="w-4 h-4" /> Volver al catálogo
+              <ChevronLeft /> Volver al catálogo
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Editar Libro</h1>
-            <p className="text-gray-500 mt-1">Modifica los detalles de "{book.title}".</p>
+            <h1 className="text-3xl font-bold text-gray-900">Editar libro</h1>
+            <p className="text-gray-500 mt-1">Modifica los detalles de "{book.title}"</p>
           </div>
         </header>
 

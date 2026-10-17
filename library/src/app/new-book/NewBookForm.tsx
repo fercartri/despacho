@@ -67,7 +67,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
 
       {/* BLOQUE 1: Información Principal */}
       <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-4">
-        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Información Principal</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Información principal</h2>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">Título del libro *</label>
@@ -101,7 +101,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
 
       {/* BLOQUE 2: Detalles de Publicación */}
       <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 space-y-4">
-        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Edición y Publicación</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">Edición y publicación</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -133,7 +133,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
             <input id="language" name="language" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="pages">Nº Páginas</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="pages">Nº páginas</label>
             <input id="pages" name="pages" type="number" min="1" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
           </div>
           <div>
@@ -172,7 +172,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación (Estantería) *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación (estantería) *</label>
             <SingleSelect 
               name="module_id" 
               options={shelves} 
@@ -196,7 +196,6 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
         </div>
       </div>
 
-      {/* CAMBIO AQUÍ: Botón reactivo al estado de isSubmitting */}
       <button 
         type="submit" 
         disabled={isSubmitting}
@@ -206,7 +205,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
             : 'bg-gray-900 text-white hover:bg-gray-800'
         }`}
       >
-        {isSubmitting ? 'Procesando imagen y guardando...' : 'Guardar Libro en la Biblioteca'}
+        {isSubmitting ? 'Procesando imagen y guardando...' : 'Guardar nuevo libro'}
       </button>
     </form>
   )
