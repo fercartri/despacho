@@ -48,7 +48,10 @@ export default async function BooksPage({
       book_authors (authors (name)),
       book_genres (genres (name))
     `)
-    .order("title")
+    .order("module_id", { ascending: true, nullsFirst: false })
+    .order("series_id", { ascending: true, nullsFirst: false })
+    .order("position_in_series", { ascending: true, nullsFirst: false })
+    .order("title", { ascending: true })
     .range(from, to);
 
   // Si se proporciona un bookId, buscar ese libro específico
