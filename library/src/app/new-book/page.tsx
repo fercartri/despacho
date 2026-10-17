@@ -8,7 +8,6 @@ export default async function NewBookPage({
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
-  const params = await searchParams
   const supabase = await createClient()
 
   // Descargamos todas las opciones en paralelo usando Promise.all para que no haya cuellos de botella
@@ -34,18 +33,11 @@ export default async function NewBookPage({
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Añadir nuevo libro</h1>
           </div>
-          <Link href="/books" className="text-sm font-medium text-gray-500 hover:text-gray-900 bg-gray-100 px-4 py-2 rounded-lg transition-colors">
+          <Link href="/books" className="text-sm font-medium text-gray-500 hover:text-gray-900 bg-gray-100 px-4 py-2 rounded-lg transition-colors flex items-center gap-1">
             <X /> Cancelar
           </Link>
         </header>
 
-        {params?.error && (
-          <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-medium">
-            ⚠️ {params.error}
-          </div>
-        )}
-
-        {/* Pasamos los datos al componente interactivo. Si alguna lista falla y es null, pasamos un array vacío [] */}
         <NewBookForm 
           authors={authors || []}
           genres={genres || []}

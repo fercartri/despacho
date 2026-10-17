@@ -5,7 +5,6 @@ import imageCompression from 'browser-image-compression'
 import MultiSelect from '@/components/MultiSelect'
 import SingleSelect from '@/components/SingleSelect'
 import { createBook } from './actions'
-import { Check, X } from 'lucide-react'
 
 type Option = { id: string, name: string }
 
@@ -22,10 +21,10 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [selectedSeries, setSelectedSeries] = useState<Option | null>(null)
   
-  // NUEVO: Estado para saber si el formulario se está enviando
+  // Estado para saber si el formulario se está enviando
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // NUEVA FUNCIÓN: Intercepta el formulario, comprime la imagen y lo envía
+  // Intercepta el formulario, comprime la imagen y lo envía
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault() // Evita que la página recargue de golpe
     setIsSubmitting(true) // Desactiva el botón
@@ -77,7 +76,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="cover">
-            Portada (Imagen)
+            Portada
           </label>
           <input 
             id="cover" 
@@ -184,8 +183,8 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="status">Estado actual *</label>
             <select id="status" name="status" className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white font-semibold shadow-sm">
-              <option value="Disponible"><Check className="text-green-500" /> Disponible</option>
-              <option value="Prestado"><X className="text-red-500" /> Prestado</option>
+              <option value="Disponible">Disponible</option>
+              <option value="Prestado">Prestado</option>
             </select>
           </div>
         </div>

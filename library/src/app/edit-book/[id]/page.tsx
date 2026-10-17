@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import EditBookForm from './EditBookForm'
-import { ChevronLeft } from 'lucide-react'
+import { X } from 'lucide-react'
 
 export default async function EditBookPage({
   params,
@@ -12,7 +12,6 @@ export default async function EditBookPage({
   searchParams: Promise<{ error?: string }>
 }) {
   const { id } = await params
-  const sParams = await searchParams
   const supabase = await createClient()
 
   // 1. Descargar el libro actual con sus autores y géneros
@@ -51,19 +50,13 @@ export default async function EditBookPage({
         
         <header className="flex justify-between items-center mb-8">
           <div>
-            <Link href="/books" className="text-sm text-gray-500 hover:text-gray-900 flex items-center gap-1.5 mb-2 transition-colors">
-              <ChevronLeft /> Volver al catálogo
-            </Link>
             <h1 className="text-3xl font-bold text-gray-900">Editar libro</h1>
             <p className="text-gray-500 mt-1">Modifica los detalles de "{book.title}"</p>
           </div>
+          <Link href="/books" className="text-sm font-medium text-gray-500 hover:text-gray-900 bg-gray-100 px-4 py-2 rounded-lg transition-colors flex items-center gap-1">
+            <X /> Cancelar
+          </Link>
         </header>
-
-        {sParams?.error && (
-          <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-medium">
-            ⚠️ {sParams.error}
-          </div>
-        )}
 
         <EditBookForm 
           book={book}

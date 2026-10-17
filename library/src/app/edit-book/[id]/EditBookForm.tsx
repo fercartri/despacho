@@ -99,7 +99,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="cover">
-            Portada (Imagen)
+            Portada
           </label>
           {book.cover_url && (
             <div className="mb-3 flex items-center gap-4 bg-white p-3 rounded-lg border border-gray-200">
@@ -216,8 +216,8 @@ export default function EditBookForm({ book, authors, genres, publishers, series
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="status">Estado actual *</label>
             <select id="status" name="status" defaultValue={book.status} className="w-full px-3 py-2 border border-gray-300 rounded-md text-black bg-white font-semibold shadow-sm">
-              <option value="Disponible"><Check className="text-green-500" /> Disponible</option>
-              <option value="Prestado"><X className="text-red-500" /> Prestado</option>
+              <option value="Disponible">Disponible</option>
+              <option value="Prestado">Prestado</option>
             </select>
           </div>
         </div>
