@@ -206,7 +206,7 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
                   <p className="text-gray-400 font-medium text-xs uppercase tracking-wider mb-1">Saga / Colección</p>
                   <p className="text-gray-900">
                     {selectedBook.series?.name ? (
-                      <span className="text-indigo-600 font-medium">
+                      <span className="font-medium">
                         {selectedBook.series.name} <span className="text-gray-500 text-xs">(Vol. {selectedBook.position_in_series || '?'})</span>
                       </span>
                     ) : '-'}
