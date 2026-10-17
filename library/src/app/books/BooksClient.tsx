@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteBook } from '@/app/actions/delete'
-import { Plus } from 'lucide-react'
+import { Plus, MapPin, Tag, Library } from 'lucide-react'
 
 export type FullBook = {
   id: string
@@ -103,18 +103,18 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
                 
                 <div className="mt-auto space-y-2">
                   {book.series?.name && (
-                    <p className="text-xs text-indigo-700 font-medium bg-indigo-50 inline-block px-2 py-0.5 rounded-md line-clamp-1">
-                      📚 {book.series.name} {book.position_in_series ? `(#${book.position_in_series})` : ''}
+                    <p className="text-xs text-indigo-700 font-medium bg-indigo-50 inline-block px-2 py-0.5 rounded-md line-clamp-1 flex items-center gap-1">
+                      <Library className="w-4 h-4" /> {book.series.name} {book.position_in_series ? `(#${book.position_in_series})` : ''}
                     </p>
                   )}
                   
                   <div className="flex flex-col gap-1 text-xs text-gray-500">
                     <div className="flex items-center gap-1.5">
-                      <span title="Módulo/Estantería">📍</span> 
+                      <span title="Módulo/Estantería"><MapPin className="w-4 h-4" /></span> 
                       <span className="truncate">{book.shelf_modules?.name || 'Sin asignar'}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span title="ISBN">🏷️</span> 
+                      <span title="ISBN"><Tag className="w-4 h-4" /></span> 
                       <span className="font-mono">{book.isbn || 'Sin ISBN'}</span>
                     </div>
                   </div>
