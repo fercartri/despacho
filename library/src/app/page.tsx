@@ -1,29 +1,26 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
-import { Book, UserCheck } from "lucide-react";
+import { Book, ChevronRight, Library, UserCheck } from "lucide-react";
 import VisualShelf from "@/app/shelves/VisualShelf"; // ¡Llamamos a tu componente!
 
 export default async function HomePage() {
   const supabase = await createClient();
 
-  // 1. OBTENER ESTADÍSTICAS
-  // Total de libros
+  // Estadísticas
   const { count: totalBooks } = await supabase
     .from('books')
     .select('*', { count: 'exact', head: true });
 
-  // Libros prestados
   const { count: loanedBooks } = await supabase
     .from('books')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'Prestado');
 
-  // Total de módulos / estanterías creadas
-  const { count: totalShelves } = await supabase
-    .from('shelf_modules')
+  const { count: totalSeries } = await supabase
+    .from('series')
     .select('*', { count: 'exact', head: true });
 
-  // 2. OBTENER LOS ÚLTIMOS 4 LIBROS AÑADIDOS
+  // Últimos añadidos
   const { data: recentBooks } = await supabase
     .from('books')
     .select(`
@@ -35,7 +32,7 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(4);
 
-  // 3. OBTENER LOS DATOS PARA LA ESTANTERÍA VISUAL
+  // Datos de estantería visual
   const { data: shelvesData } = await supabase
     .from("shelf_modules")
     .select("id, name, books(id)");
@@ -66,13 +63,24 @@ export default async function HomePage() {
               <p className="text-2xl font-bold text-gray-900">{loanedBooks || 0}</p>
             </div>
           </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
+            <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center"><Library /></div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Número de sagas</p>
+              <p className="text-2xl font-bold text-gray-900">{totalSeries || 0}</p>
+            </div>
+          </div>
         </div>
 
         {/* ESTANTERÍA VISUAL */}
         <section>
           <div className="flex justify-between items-end mb-4">
             <h2 className="text-xl font-bold text-gray-900">Estantería principal</h2>
-            <Link href="/shelves" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Gestionar estanterías</Link>
+            <Link href="/shelves" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+              Gestionar estanterías
+              <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
           <VisualShelf shelvesList={shelvesData || []} />
         </section>
@@ -81,7 +89,10 @@ export default async function HomePage() {
         <section>
           <div className="flex justify-between items-end mb-4">
             <h2 className="text-xl font-bold text-gray-900">Últimos libros añadidos</h2>
-            <Link href="/books" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">Catálogo completo</Link>
+            <Link href="/books" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+              Catálogo completo
+              <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
