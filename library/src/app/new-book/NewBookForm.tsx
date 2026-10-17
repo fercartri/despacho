@@ -204,7 +204,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
             : 'bg-gray-900 text-white hover:bg-gray-800'
         }`}
       >
-        {isSubmitting ? 'Procesando imagen y guardando...' : 'Guardar nuevo libro'}
+        {isSubmitting ? 'Guardando nuevo libro...' : 'Guardar nuevo libro'}
       </button>
     </form>
   )

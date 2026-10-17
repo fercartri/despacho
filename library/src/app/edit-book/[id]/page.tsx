@@ -6,15 +6,13 @@ import { X } from 'lucide-react'
 
 export default async function EditBookPage({
   params,
-  searchParams
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ error?: string }>
 }) {
   const { id } = await params
   const supabase = await createClient()
 
-  // 1. Descargar el libro actual con sus autores y géneros
+  // Descargar el libro actual con sus autores y géneros
   const { data: book } = await supabase
     .from('books')
     .select(`
@@ -29,7 +27,7 @@ export default async function EditBookPage({
     notFound()
   }
 
-  // 2. Descargar las opciones para los desplegables
+  // Descargar las opciones para los desplegables
   const [
     { data: authors },
     { data: genres },
@@ -51,10 +49,9 @@ export default async function EditBookPage({
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Editar libro</h1>
-            <p className="text-gray-500 mt-1">Modifica los detalles de "{book.title}"</p>
           </div>
           <Link href="/books" className="text-sm font-medium text-gray-500 hover:text-gray-900 bg-gray-100 px-4 py-2 rounded-lg transition-colors flex items-center gap-1">
-            <X /> Cancelar
+            <X className="w-4 h-4" /> Cancelar
           </Link>
         </header>
 

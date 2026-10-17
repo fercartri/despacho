@@ -5,7 +5,6 @@ import imageCompression from 'browser-image-compression'
 import MultiSelect from '@/components/MultiSelect'
 import SingleSelect from '@/components/SingleSelect'
 import { updateBook } from './actions'
-import { Check, X } from 'lucide-react'
 
 type Option = { id: string, name: string }
 
@@ -237,7 +236,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
             : 'bg-gray-900 text-white hover:bg-gray-800'
         }`}
       >
-        {isSubmitting ? 'Guardando cambios...' : 'Guardar libro'}
+        {isSubmitting ? 'Guardando libro...' : 'Guardar libro'}
       </button>
     </form>
   )

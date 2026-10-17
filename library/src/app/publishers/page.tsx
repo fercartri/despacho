@@ -3,6 +3,7 @@ import Link from "next/link";
 import ActionButtons from '@/components/ActionButtons'
 import { deletePublisher } from '@/app/actions/delete'
 import { PublisherIcon } from '@/components/EntityIcons'
+import { Plus } from "lucide-react";
 
 export default async function PublishersPage() {
   const supabase = await createClient();
@@ -13,11 +14,8 @@ export default async function PublishersPage() {
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Editoriales</h1>
-          <Link 
-            href="/publishers/new" 
-            className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm"
-          >
-            + Nueva Editorial
+          <Link href="/publishers/new" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1">
+            <Plus className="w-4 h-4" /> Nueva editorial
           </Link>
         </header>
 
@@ -47,7 +45,7 @@ export default async function PublishersPage() {
         
         {publishers?.length === 0 && (
           <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
-            <p className="text-gray-500">No hay editoriales registradas.</p>
+            <p className="text-gray-500">Todavía no hay editoriales registradas</p>
           </div>
         )}
       </div>

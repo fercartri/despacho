@@ -1,28 +1,20 @@
 import { createGenre } from './actions'
 import Link from 'next/link'
+import { X } from 'lucide-react';
 
-export default async function NewGenrePage({
-  searchParams
-}: {
-  searchParams: Promise<{ error?: string }>
-}) {
-  const params = await searchParams;
-
+export default async function NewGenrePage() {
   return (
-    <main className="p-8 max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
+    <main className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 p-8 md:p-12">
+        
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Añadir Nuevo Género</h1>
-          <Link href="/genres" className="text-sm text-gray-500 hover:text-gray-900">
-            ← Volver a géneros
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Añadir nuevo género</h1>
+          </div>
+          <Link href="/genres" className="text-sm font-medium text-gray-500 hover:text-gray-900 bg-gray-100 px-4 py-2 rounded-lg transition-colors flex items-center gap-1">
+            <X className="w-4 h-4" /> Cancelar
           </Link>
         </header>
-
-        {params?.error && (
-          <div className="mb-6 p-3 bg-red-100 text-red-700 rounded-md text-sm">
-            {params.error}
-          </div>
-        )}
 
         <form action={createGenre} className="flex flex-col gap-6">
           <div>
@@ -40,9 +32,10 @@ export default async function NewGenrePage({
           </div>
 
           <button type="submit" className="w-full bg-gray-900 text-white py-3 rounded-md hover:bg-gray-800">
-            Guardar Género
+            Guardar nuevo género
           </button>
         </form>
+
       </div>
     </main>
   )

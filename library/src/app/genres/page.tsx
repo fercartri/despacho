@@ -47,7 +47,7 @@ export default async function GenresPage() {
         
         {genres?.length === 0 && (
           <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
-            <p className="text-gray-500">No hay géneros registrados.</p>
+            <p className="text-gray-500">Todavía no hay géneros registrados</p>
           </div>
         )}
       </div>
