@@ -199,7 +199,7 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
 
               <div className="grid grid-cols-2 gap-y-5 gap-x-6 text-sm mb-8">
                 <div>
-                  <p className="text-gray-400 font-medium text-xs uppercase tracking-wider mb-1">Ubicación</p>
+                  <p className="text-gray-400 font-medium text-xs uppercase tracking-wider mb-1">Módulo</p>
                   <p className="text-gray-900 font-medium">{selectedBook.shelf_modules?.name || 'Sin asignar'}</p>
                 </div>
                 <div>

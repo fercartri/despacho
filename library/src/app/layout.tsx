@@ -9,7 +9,7 @@ import { LogOut } from 'lucide-react'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Mi Biblioteca",
+  title: "Biblioteca Carmona Palacio",
   description: "Gestor personal de libros",
 };
 
