@@ -62,48 +62,7 @@ export default async function BooksPage({
   return (
     <main className="min-h-screen bg-gray-50 p-8 pb-16">
       <div className="max-w-7xl mx-auto">
-
-        {/* Controles de paginación */}
-        {totalPages > 1 && (
-          <div className="flex justify-between items-center mt-12 bg-white px-6 py-4 rounded-xl border border-gray-200 shadow-sm">
-            
-            {/* Botón Anterior */}
-            {currentPage > 1 ? (
-              <Link
-                href={`/books?page=${currentPage - 1}`}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" /> Anterior
-              </Link>
-            ) : (
-              <span className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-300 bg-gray-50 rounded-lg cursor-not-allowed">
-                <ChevronLeft className="w-4 h-4" /> Anterior
-              </span>
-            )}
-
-            {/* Texto informativo de página */}
-            <span className="text-sm font-medium text-gray-600">
-              Página <span className="font-bold text-gray-900">{currentPage}</span> de <span className="font-bold text-gray-900">{totalPages}</span> 
-              <span className="text-gray-400 ml-1">({totalBooks} libros en total)</span>
-            </span>
-
-            {/* Botón Siguiente */}
-            {currentPage < totalPages ? (
-              <Link
-                href={`/books?page=${currentPage + 1}`}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
-                Siguiente <ChevronRight className="w-4 h-4" />
-              </Link>
-            ) : (
-              <span className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-300 bg-gray-50 rounded-lg cursor-not-allowed">
-                Siguiente <ChevronRight className="w-4 h-4" />
-              </span>
-            )}
-
-          </div>
-        )}
-        
+                
         {/* Aquí va tu componente cliente con la parrilla de libros */}
         <BooksClient books={(books as FullBook[]) || []} />
 
