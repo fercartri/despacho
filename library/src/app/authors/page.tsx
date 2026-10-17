@@ -10,11 +10,13 @@ export default async function AuthorsPage() {
   const { data: authors } = await supabase.from("authors").select("*").order("name");
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-gray-50 p-8 pb-16">
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Autores</h1>
-          <Link href="/authors/new" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1"><Plus className="text-white" />Nuevo autor</Link>
+          <Link href="/new-author" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1">
+            <Plus className="w-4 h-4" /> Nuevo autor
+          </Link>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

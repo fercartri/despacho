@@ -10,11 +10,11 @@ export default async function PublishersPage() {
   const { data: publishers } = await supabase.from("publishers").select("*").order("name");
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-gray-50 p-8 pb-16">
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Editoriales</h1>
-          <Link href="/publishers/new" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1">
+          <Link href="/new-publisher" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1">
             <Plus className="w-4 h-4" /> Nueva editorial
           </Link>
         </header>
@@ -29,20 +29,20 @@ export default async function PublishersPage() {
                   {publisher.name}
                 </h2>
               </div>
-
+              
               <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-3">
                 <ActionButtons 
                   id={publisher.id} 
                   editUrl={`/publishers/${publisher.id}/edit`} 
                   deleteAction={deletePublisher}
-                  confirmMessage={`¿Seguro que quieres borrar la editorial "${publisher.name}"?`}
+                  confirmMessage={`¿Seguro que quieres borrar a "${publisher.name}"?`}
                 />
               </div>
 
             </div>
           ))}
         </div>
-        
+
         {publishers?.length === 0 && (
           <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
             <p className="text-gray-500">Todavía no hay editoriales registradas</p>

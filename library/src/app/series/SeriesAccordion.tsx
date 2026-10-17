@@ -5,6 +5,7 @@ import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteSeries } from '@/app/actions/delete'
 import { SeriesIcon } from '@/components/EntityIcons'
+import { ChevronDown, Eye } from 'lucide-react'
 
 type Book = {
   id: string
@@ -58,7 +59,6 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
 
               {/* Botones de acción y Flecha */}
               <div className="flex items-center gap-4">
-                {/* Los botones aparecen al pasar el ratón. stopPropagation evita que se despliegue al pulsar editar/borrar */}
                 <div 
                   className="opacity-0 group-hover/series:opacity-100 transition-opacity" 
                   onClick={(e) => e.stopPropagation()}
@@ -69,16 +69,13 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
                     deleteAction={deleteSeries}
                     confirmMessage={
                       item.books.length > 0 
-                        ? `¡PELIGRO CRÍTICO! ¿Seguro que quieres borrar "${item.name}"? Se ELIMINARÁN PARA SIEMPRE los ${item.books.length} libros que contiene.`
+                        ? `¿Seguro que quieres borrar "${item.name}"? Se eliminarán para simepre los ${item.books.length} libros que contiene`
                         : `¿Seguro que quieres borrar la saga "${item.name}"?`
                     }
                   />
                 </div>
                 
-                {/* Icono de flecha (gira cuando se abre) */}
-                <div className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                  ▼
-                </div>
+                <ChevronDown className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
               </div>
             </div>
 
@@ -106,13 +103,12 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
                             {book.status}
                           </span>
                           
-                          {/* Botón del OJO: Enlazamos al catálogo pasando el ID por la URL */}
                           <Link 
                             href={`/books?bookId=${book.id}`}
-                            className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
                             title="Ver detalles completos del libro"
                           >
-                            👁️
+                            <Eye className="w-4 h-4" />
                           </Link>
                         </div>
 
@@ -121,7 +117,7 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
                   </ul>
                 ) : (
                   <div className="p-6 text-center text-gray-500 italic text-sm">
-                    No hay libros registrados en esta saga todavía.
+                    Todavía no hay libros registrados
                   </div>
                 )}
               </div>
@@ -129,10 +125,10 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
           </div>
         )
       })}
-      
-      {seriesList.length === 0 && (
-        <div className="text-center bg-white rounded-xl border border-gray-200 p-12 mt-4">
-          <p className="text-gray-500">No hay sagas registradas.</p>
+
+      {seriesList?.length === 0 && (
+        <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
+          <p className="text-gray-500">Todavía no hay sagas registradas</p>
         </div>
       )}
     </div>

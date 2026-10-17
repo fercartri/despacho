@@ -26,20 +26,24 @@ export type FullBook = {
   book_genres: { genres: { name: string } | null }[]
 }
 
-export default function BooksClient({ books }: { books: FullBook[] }) {
+export default function BooksClient({ books, targetBook }: { books: FullBook[]; targetBook: FullBook | null }) {
   const [selectedBook, setSelectedBook] = useState<FullBook | null>(null)
   const searchParams = useSearchParams()
   const router = useRouter()
 
   useEffect(() => {
-    const bookId = searchParams.get('bookId')
-    if (bookId) {
-      const bookToOpen = books.find(b => b.id === bookId)
-      if (bookToOpen) {
-        setSelectedBook(bookToOpen)
+    if (targetBook) {
+      setSelectedBook(targetBook)
+    } else {
+      const bookId = searchParams.get('bookId')
+      if (bookId) {
+        const bookToOpen = books.find(b => b.id === bookId)
+        if (bookToOpen) {
+          setSelectedBook(bookToOpen)
+        }
       }
     }
-  }, [searchParams, books])
+  }, [searchParams, books, targetBook])
 
   const closeModal = () => {
     setSelectedBook(null)
@@ -58,7 +62,9 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
     <div className="max-w-7xl mx-auto">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Libros</h1>
-        <Link href="/new-book" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1"><Plus className="w-4 h-4" />Nuevo libro</Link>
+        <Link href="/new-book" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1">
+          <Plus className="w-4 h-4" /> Nuevo libro
+        </Link>
       </header>
 
       {/* LISTA PRINCIPAL (Grid de tarjetas resumen) */}
@@ -169,7 +175,7 @@ export default function BooksClient({ books }: { books: FullBook[] }) {
                     id={selectedBook.id} 
                     editUrl={`/edit-book/${selectedBook.id}`} 
                     deleteAction={handleDeleteBook}
-                    confirmMessage={`¿Seguro que quieres borrar "${selectedBook.title}" de tu biblioteca?`}
+                    confirmMessage={`¿Seguro que quieres borrar "${selectedBook.title}"?`}
                   />
                 </div>
               </div>

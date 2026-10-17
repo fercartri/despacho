@@ -6,10 +6,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 export default async function BooksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; bookId?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
+
+  const targetBookId = params?.bookId;
 
   // Configuración de la paginación
   const PAGE_SIZE = 20; // 20 libros por página
@@ -49,6 +51,35 @@ export default async function BooksPage({
     .order("title")
     .range(from, to);
 
+  // Si se proporciona un bookId, buscar ese libro específico
+  let targetBook = null;
+  if (targetBookId) {
+    const { data: foundBook } = await supabase
+      .from("books")
+      .select(`
+        id,
+        title,
+        isbn,
+        year,
+        edition,
+        language,
+        pages,
+        description,
+        cover_url,
+        status,
+        position_in_series,
+        publishers (name),
+        series (name),
+        shelf_modules (name),
+        book_authors (authors (name)),
+        book_genres (genres (name))
+      `)
+      .eq('id', targetBookId)
+      .single();
+
+    targetBook = foundBook;
+  }
+
   if (error) {
     return (
       <main className="p-8">
@@ -64,7 +95,7 @@ export default async function BooksPage({
       <div className="max-w-7xl mx-auto">
                 
         {/* Aquí va tu componente cliente con la parrilla de libros */}
-        <BooksClient books={(books as FullBook[]) || []} />
+        <BooksClient books={(books as FullBook[]) || []} targetBook={targetBook as unknown as FullBook | null} />
 
         {/* Controles de paginación */}
         {totalPages > 1 && (
@@ -73,7 +104,7 @@ export default async function BooksPage({
             {/* Botón Anterior */}
             {currentPage > 1 ? (
               <Link
-                href={`/books?page=${currentPage - 1}`}
+                href={`/books?page=${currentPage - 1}${targetBookId ? `&bookId=${targetBookId}` : ''}`}
                 className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" /> Anterior
@@ -93,7 +124,7 @@ export default async function BooksPage({
             {/* Botón Siguiente */}
             {currentPage < totalPages ? (
               <Link
-                href={`/books?page=${currentPage + 1}`}
+                href={`/books?page=${currentPage + 1}${targetBookId ? `&bookId=${targetBookId}` : ''}`}
                 className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 Siguiente <ChevronRight className="w-4 h-4" />

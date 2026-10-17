@@ -90,9 +90,7 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
                   />
                 </div>
                 
-                <div className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                  <ChevronDown />
-                </div>
+                <ChevronDown className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
               </div>
             </div>
 
@@ -125,10 +123,10 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
                             
                             <Link
                               href={`/books?bookId=${book.id}`}
-                              className="p-2 text-gray-900 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                              className="p-2 text-gray-900 hover:text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
                               title="Ver detalles completos del libro"
                             >
-                              <Eye />
+                              <Eye className="w-4 h-4" />
                             </Link>
                           </div>
 
@@ -146,6 +144,12 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
           </div>
         )
       })}
+
+      {shelvesList?.length === 0 && (
+        <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
+          <p className="text-gray-500">Todavía no hay sagas registradas</p>
+        </div>
+      )}
     </div>
   )
 }
