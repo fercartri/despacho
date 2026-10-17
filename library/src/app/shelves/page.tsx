@@ -35,8 +35,7 @@ export default async function ShelvesPage() {
           </Link>
         </header>
 
-        {/* Inyectamos el componente interactivo con los datos */}
-        <ShelvesAccordion shelvesList={shelves || []} />
+        <ShelvesAccordion shelvesList={(shelves as unknown as any[]) || []} />
 
         {shelves?.length === 0 && (
           <div className="text-center bg-white rounded-xl border border-gray-200 p-12 mt-4">

@@ -12,7 +12,7 @@ export default async function EditShelfPage({
   const { id } = await params
 
   const supabase = await createClient()
-  const { data: shelf } = await supabase.from('shelves').select('*').eq('id', id).single()
+  const { data: shelf } = await supabase.from('shelf_modules').select('*').eq('id', id).single()
 
   if (!shelf) redirect('/shelves')
 

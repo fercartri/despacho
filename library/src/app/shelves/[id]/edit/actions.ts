@@ -11,7 +11,7 @@ export async function updateShelf(id: string, formData: FormData) {
 
   // Usamos .update() y .eq('id', id) para modificar solo ese registro
   const { error } = await supabase
-    .from('shelves')
+    .from('shelf_modules')
     .update({ name })
     .eq('id', id)
 
