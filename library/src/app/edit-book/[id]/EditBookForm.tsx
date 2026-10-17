@@ -234,7 +234,7 @@ export default function EditBookForm({ book, authors, genres, publishers, series
         className={`w-full py-4 rounded-xl font-bold text-lg shadow-md transition-all ${
           isSubmitting 
             ? 'bg-gray-400 text-white cursor-not-allowed' 
-            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+            : 'bg-gray-900 text-white hover:bg-gray-800'
         }`}
       >
         {isSubmitting ? 'Guardando cambios...' : 'Guardar libro'}
