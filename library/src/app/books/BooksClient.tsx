@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteBook } from '@/app/actions/delete'
-import { Plus, MapPin, Tag, Library, X } from 'lucide-react'
+import { Plus, MapPin, Tag, Library, X, Search, Loader2 } from 'lucide-react'
 
 export type FullBook = {
   id: string
@@ -26,8 +26,19 @@ export type FullBook = {
   book_genres: { genres: { name: string } | null }[]
 }
 
-export default function BooksClient({ books, targetBook }: { books: FullBook[]; targetBook: FullBook | null }) {
+export default function BooksClient({ 
+  books, 
+  targetBook, 
+  initialQuery 
+}: { 
+  books: FullBook[]; 
+  targetBook: FullBook | null;
+  initialQuery: string;
+}) {
   const [selectedBook, setSelectedBook] = useState<FullBook | null>(null)
+  const [searchQuery, setSearchQuery] = useState(initialQuery)
+  const [isPending, startTransition] = useTransition()
+  
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -47,9 +58,11 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
 
   const closeModal = () => {
     setSelectedBook(null)
-    // Si había un bookId en la URL, la limpiamos (así si recargas la página, no se vuelve a abrir solo)
-    if (searchParams.has('bookId')) {
-      router.replace('/books', { scroll: false })
+    const bookId = searchParams.get('bookId')
+    if (bookId) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('bookId')
+      router.replace(`/books${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false })
     }
   }
 
@@ -58,14 +71,61 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
     closeModal()
   }
 
+  // Manejador del input de búsqueda con actualización fluida en la URL
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (value.trim()) {
+        params.set('q', value);
+        params.set('page', '1'); // Reiniciar a la primera página al buscar
+      } else {
+        params.delete('q');
+      }
+      router.replace(`/books${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false });
+    });
+  }
+
   return (
     <div className="max-w-7xl mx-auto">
-      <header className="flex justify-between items-center mb-8">
+      {/* Cabecera unificada */}
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Libros</h1>
         <Link href="/new-book" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1">
           <Plus className="w-4 h-4" /> Nuevo libro
         </Link>
       </header>
+
+      {/* BARRA DE BÚSQUEDA POR TÍTULO */}
+      <div className="mb-8 relative">
+        <div className="relative max-w-xl">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+            {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Buscar por título de libro..."
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent shadow-sm transition-all text-sm"
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => {
+                setSearchQuery('');
+                const params = new URLSearchParams(searchParams.toString());
+                params.delete('q');
+                router.replace(`/books${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false });
+              }}
+              className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* LISTA PRINCIPAL (Grid de tarjetas resumen) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -84,13 +144,10 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
               {/* Portada */}
               <div className="h-56 bg-gray-100 flex items-center justify-center text-gray-400 relative border-b border-gray-100">
                 {book.cover_url ? (
-                  // Si hay URL, mostramos la imagen ocupando todo el espacio (object-cover)
                   <img src={book.cover_url} alt={`Portada de ${book.title}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 ) : (
-                  // Si no hay foto, mostramos el icono por defecto
                   <svg className="w-12 h-12 opacity-20" fill="currentColor" viewBox="0 0 24 24"><path d="M4 19v-14c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2h-14c-1.1 0-2-.9-2-2zm2-14v14h12v-14h-12zm2 2h8v2h-8v-2zm0 4h8v2h-8v-2z"/></svg>
                 )}
-                {/* Etiqueta flotante de estado en la portada */}
                 <div className="absolute top-3 right-3">
                   <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide rounded-full shadow-sm backdrop-blur-md ${
                     book.status === 'Disponible' ? 'bg-green-100/90 text-green-800 border border-green-200' : 'bg-orange-100/90 text-orange-800 border border-orange-200'
@@ -135,8 +192,8 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
       </div>
 
       {books.length === 0 && (
-        <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
-          <p className="text-gray-500">Todavía no hay libros registrados</p>
+        <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4 shadow-sm">
+          <p className="text-gray-500">No se ha encontrado ningún libro con ese título</p>
         </div>
       )}
 
@@ -145,7 +202,6 @@ export default function BooksClient({ books, targetBook }: { books: FullBook[]; 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gray-900/60 backdrop-blur-sm" onClick={closeModal}>
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative flex flex-col md:flex-row" onClick={(e) => e.stopPropagation()}>
             
-            {/* Botón de cerrar (X) */}
             <button 
               onClick={() => closeModal()}
               className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 hover:text-gray-900 text-gray-500 transition-colors z-10"
