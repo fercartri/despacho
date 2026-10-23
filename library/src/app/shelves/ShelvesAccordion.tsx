@@ -48,6 +48,10 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
     setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
   }
 
+  if (!shelvesList || shelvesList.length === 0) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {shelvesList.map((shelf) => {
@@ -144,12 +148,6 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
           </div>
         )
       })}
-
-      {shelvesList?.length === 0 && (
-        <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
-          <p className="text-gray-500">Todavía no hay sagas registradas</p>
-        </div>
-      )}
     </div>
   )
 }

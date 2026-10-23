@@ -28,6 +28,10 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
     setExpanded(prev => ({ ...prev, [id]: !prev[id] }))
   }
 
+  if (!seriesList || seriesList.length === 0) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {seriesList.map((item) => {
@@ -125,12 +129,6 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
           </div>
         )
       })}
-
-      {seriesList?.length === 0 && (
-        <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
-          <p className="text-gray-500">Todavía no hay sagas registradas</p>
-        </div>
-      )}
     </div>
   )
 }
