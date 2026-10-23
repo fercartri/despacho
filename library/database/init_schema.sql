@@ -1,7 +1,6 @@
 -- ==========================================
 -- 0. LIMPIEZA INICIAL (Por si había algo previo)
 -- ==========================================
-DROP TABLE IF EXISTS loans CASCADE;
 DROP TABLE IF EXISTS book_genres CASCADE;
 DROP TABLE IF EXISTS book_authors CASCADE;
 DROP TABLE IF EXISTS books CASCADE;
@@ -83,15 +82,6 @@ CREATE TABLE book_genres (
   PRIMARY KEY (book_id, genre_id)
 );
 
-CREATE TABLE loans (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  book_id UUID REFERENCES books(id) ON DELETE CASCADE NOT NULL,
-  borrower_name TEXT NOT NULL,
-  borrowed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  returned_at TIMESTAMP WITH TIME ZONE,
-  notes TEXT
-);
-
 -- ==========================================
 -- 4. SEGURIDAD (ROW LEVEL SECURITY)
 -- ==========================================
@@ -104,7 +94,6 @@ ALTER TABLE shelf_modules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE books ENABLE ROW LEVEL SECURITY;
 ALTER TABLE book_authors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE book_genres ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loans ENABLE ROW LEVEL SECURITY;
 
 -- Políticas: Solo los usuarios logueados pueden hacer SELECT, INSERT, UPDATE y DELETE
 CREATE POLICY "Acceso logueados" ON authors FOR ALL USING (auth.role() = 'authenticated');
@@ -115,7 +104,6 @@ CREATE POLICY "Acceso logueados" ON shelf_modules FOR ALL USING (auth.role() = '
 CREATE POLICY "Acceso logueados" ON books FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Acceso logueados" ON book_authors FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Acceso logueados" ON book_genres FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Acceso logueados" ON loans FOR ALL USING (auth.role() = 'authenticated');
 
 -- ==========================================
 -- 5. EJEMPLOS
@@ -162,7 +150,4 @@ BEGIN
   INSERT INTO book_genres (book_id, genre_id) VALUES (v_book_1, v_genre_1);
   INSERT INTO book_genres (book_id, genre_id) VALUES (v_book_2, v_genre_2);
 
-  -- 4. Registrar préstamo para Libro2
-  INSERT INTO loans (book_id, borrower_name, notes) 
-  VALUES (v_book_2, 'Prestatario1', 'Préstamo de prueba para Libro2');
 END $$;
