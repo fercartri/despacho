@@ -139,8 +139,8 @@ export default function ShelvesAccordion({ shelvesList }: { shelvesList: Shelf[]
                     })}
                   </ul>
                 ) : (
-                  <div className="p-6 text-center text-gray-500 italic text-sm">
-                    Esta estantería está vacía actualmente.
+                  <div className="p-6 text-center text-gray-500 text-sm">
+                    Todavía no hay libros registrados en esta estantería
                   </div>
                 )}
               </div>
