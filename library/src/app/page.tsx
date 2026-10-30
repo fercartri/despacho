@@ -63,14 +63,6 @@ export default async function HomePage() {
               <p className="text-2xl font-bold text-gray-900">{loanedBooks || 0}</p>
             </div>
           </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
-            <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center"><Library /></div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Número de sagas</p>
-              <p className="text-2xl font-bold text-gray-900">{totalSeries || 0}</p>
-            </div>
-          </div>
         </div>
 
         {/* ESTANTERÍA VISUAL */}
