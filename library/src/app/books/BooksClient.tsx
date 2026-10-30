@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteBook } from '@/app/actions/delete'
-import { Plus, MapPin, Tag, Library, X, Search, Loader2 } from 'lucide-react'
+import { Plus, MapPin, Tag, Library, X, Search, Loader2, SlidersHorizontal, ChevronDown, Check } from 'lucide-react'
 
 export type FullBook = {
   id: string
@@ -39,6 +39,19 @@ export default function BooksClient({
   const [searchQuery, setSearchQuery] = useState(initialQuery)
   const [isPending, startTransition] = useTransition()
   
+  // Estado para el panel de filtros desplegable
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+
+  // Estados de filtros seleccionados (arrays con nombres únicos)
+  const [selectedAuthors, setSelectedAuthors] = useState<string[]>([])
+  const [selectedPublishers, setSelectedPublishers] = useState<string[]>([])
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([])
+  const [selectedSeries, setSelectedSeries] = useState<string[]>([])
+  const [selectedModules, setSelectedModules] = useState<string[]>([])
+
+  // Estado para controlar qué desplegable de categoría está abierto dentro del panel
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -71,7 +84,7 @@ export default function BooksClient({
     closeModal()
   }
 
-  // Manejador del input de búsqueda con actualización fluida en la URL
+  // Manejador de la barra de búsqueda por título
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
@@ -80,13 +93,83 @@ export default function BooksClient({
       const params = new URLSearchParams(searchParams.toString());
       if (value.trim()) {
         params.set('q', value);
-        params.set('page', '1'); // Reiniciar a la primera página al buscar
+        params.set('page', '1');
       } else {
         params.delete('q');
       }
       router.replace(`/books${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false });
     });
   }
+
+  // --- OBTENER LISTAS ÚNICAS DE FILTROS A PARTIR DE LOS LIBROS CARGADOS ---
+  const allAuthors = Array.from(new Set(books.flatMap(b => b.book_authors.map(ba => ba.authors?.name).filter(Boolean)))) as string[];
+  const allPublishers = Array.from(new Set(books.map(b => b.publishers?.name).filter(Boolean))) as string[];
+  const allGenres = Array.from(new Set(books.flatMap(b => b.book_genres.map(bg => bg.genres?.name).filter(Boolean)))) as string[];
+  const allSeries = Array.from(new Set(books.map(b => b.series?.name).filter(Boolean))) as string[];
+  const allModules = Array.from(new Set(books.map(b => b.shelf_modules?.name).filter(Boolean))) as string[];
+
+  // --- LÓGICA DE FILTRADO COMBINADO ---
+  const filteredBooks = books.filter(book => {
+    // 1. Filtro de búsqueda por título
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const title = (book.title || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (!title.includes(query)) return false;
+    }
+
+    // 2. Filtro por Autores
+    if (selectedAuthors.length > 0) {
+      const bookAuthorNames = book.book_authors.map(ba => ba.authors?.name).filter(Boolean);
+      const matches = selectedAuthors.some(author => bookAuthorNames.includes(author));
+      if (!matches) return false;
+    }
+
+    // 3. Filtro por Editoriales
+    if (selectedPublishers.length > 0) {
+      const pubName = book.publishers?.name;
+      if (!pubName || !selectedPublishers.includes(pubName)) return false;
+    }
+
+    // 4. Filtro por Géneros
+    if (selectedGenres.length > 0) {
+      const bookGenreNames = book.book_genres.map(bg => bg.genres?.name).filter(Boolean);
+      const matches = selectedGenres.some(genre => bookGenreNames.includes(genre));
+      if (!matches) return false;
+    }
+
+    // 5. Filtro por Sagas
+    if (selectedSeries.length > 0) {
+      const seriesName = book.series?.name;
+      if (!seriesName || !selectedSeries.includes(seriesName)) return false;
+    }
+
+    // 6. Filtro por Módulos
+    if (selectedModules.length > 0) {
+      const moduleName = book.shelf_modules?.name;
+      if (!moduleName || !selectedModules.includes(moduleName)) return false;
+    }
+
+    return true;
+  });
+
+  // Funciones de selección de checkboxes
+  const toggleFilterItem = (list: string[], setList: (val: string[]) => void, item: string) => {
+    if (list.includes(item)) {
+      setList(list.filter(i => i !== item));
+    } else {
+      setList([...list, item]);
+    }
+  };
+
+  const resetAllFilters = () => {
+    setSelectedAuthors([]);
+    setSelectedPublishers([]);
+    setSelectedGenres([]);
+    setSelectedSeries([]);
+    setSelectedModules([]);
+  };
+
+  const activeFiltersCount = selectedAuthors.length + selectedPublishers.length + selectedGenres.length + selectedSeries.length + selectedModules.length;
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -98,9 +181,9 @@ export default function BooksClient({
         </Link>
       </header>
 
-      {/* BARRA DE BÚSQUEDA POR TÍTULO */}
-      <div className="mb-8 relative">
-        <div className="relative max-w-xl">
+      {/* BARRA DE BÚSQUEDA Y BOTÓN DE FILTROS */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+        <div className="relative flex-1 max-w-xl">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
             {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
           </span>
@@ -125,11 +208,185 @@ export default function BooksClient({
             </button>
           )}
         </div>
+
+        {/* Botón para desplegar el panel de filtros */}
+        <button
+          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+          className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors shadow-sm ${
+            activeFiltersCount > 0 
+              ? 'bg-gray-900 text-white border-gray-900 hover:bg-gray-800' 
+              : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          <span>Filtros</span>
+          {activeFiltersCount > 0 && (
+            <span className="ml-1 w-5 h-5 rounded-full bg-white text-gray-900 text-xs font-bold flex items-center justify-center">
+              {activeFiltersCount}
+            </span>
+          )}
+        </button>
       </div>
+
+      {/* PANEL DESPLEGABLE DE FILTROS */}
+      {isFiltersOpen && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-md transition-all">
+          <div className="flex justify-between items-center pb-4 mb-4 border-b border-gray-100">
+            <h3 className="font-bold text-gray-900 text-base">Filtrar catálogo</h3>
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={resetAllFilters}
+                className="text-xs font-medium text-red-600 hover:text-red-800 transition-colors"
+              >
+                Resetear filtros
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            
+            {/* 1. FILTRO AUTOR */}
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'author' ? null : 'author')}
+                className="w-full flex justify-between items-center px-3.5 py-2 text-xs font-medium bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-700"
+              >
+                <span className="truncate">Autor {selectedAuthors.length > 0 && `(${selectedAuthors.length})`}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+              </button>
+              {openDropdown === 'author' && (
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2 space-y-1">
+                  {allAuthors.map(author => (
+                    <label key={author} className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded text-xs cursor-pointer text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={selectedAuthors.includes(author)}
+                        onChange={() => toggleFilterItem(selectedAuthors, setSelectedAuthors, author)}
+                        className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
+                      />
+                      <span className="truncate">{author}</span>
+                    </label>
+                  ))}
+                  {allAuthors.length === 0 && <p className="text-xs text-gray-400 p-2 text-center">No hay autores</p>}
+                </div>
+              )}
+            </div>
+
+            {/* 2. FILTRO EDITORIAL */}
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'publisher' ? null : 'publisher')}
+                className="w-full flex justify-between items-center px-3.5 py-2 text-xs font-medium bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-700"
+              >
+                <span className="truncate">Editorial {selectedPublishers.length > 0 && `(${selectedPublishers.length})`}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+              </button>
+              {openDropdown === 'publisher' && (
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2 space-y-1">
+                  {allPublishers.map(pub => (
+                    <label key={pub} className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded text-xs cursor-pointer text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={selectedPublishers.includes(pub)}
+                        onChange={() => toggleFilterItem(selectedPublishers, setSelectedPublishers, pub)}
+                        className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
+                      />
+                      <span className="truncate">{pub}</span>
+                    </label>
+                  ))}
+                  {allPublishers.length === 0 && <p className="text-xs text-gray-400 p-2 text-center">No hay editoriales</p>}
+                </div>
+              )}
+            </div>
+
+            {/* 3. FILTRO GÉNERO */}
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'genre' ? null : 'genre')}
+                className="w-full flex justify-between items-center px-3.5 py-2 text-xs font-medium bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-700"
+              >
+                <span className="truncate">Género {selectedGenres.length > 0 && `(${selectedGenres.length})`}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+              </button>
+              {openDropdown === 'genre' && (
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2 space-y-1">
+                  {allGenres.map(genre => (
+                    <label key={genre} className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded text-xs cursor-pointer text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={selectedGenres.includes(genre)}
+                        onChange={() => toggleFilterItem(selectedGenres, setSelectedGenres, genre)}
+                        className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
+                      />
+                      <span className="truncate">{genre}</span>
+                    </label>
+                  ))}
+                  {allGenres.length === 0 && <p className="text-xs text-gray-400 p-2 text-center">No hay géneros</p>}
+                </div>
+              )}
+            </div>
+
+            {/* 4. FILTRO SAGA */}
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'series' ? null : 'series')}
+                className="w-full flex justify-between items-center px-3.5 py-2 text-xs font-medium bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-700"
+              >
+                <span className="truncate">Saga {selectedSeries.length > 0 && `(${selectedSeries.length})`}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+              </button>
+              {openDropdown === 'series' && (
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2 space-y-1">
+                  {allSeries.map(series => (
+                    <label key={series} className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded text-xs cursor-pointer text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={selectedSeries.includes(series)}
+                        onChange={() => toggleFilterItem(selectedSeries, setSelectedSeries, series)}
+                        className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
+                      />
+                      <span className="truncate">{series}</span>
+                    </label>
+                  ))}
+                  {allSeries.length === 0 && <p className="text-xs text-gray-400 p-2 text-center">No hay sagas</p>}
+                </div>
+              )}
+            </div>
+
+            {/* 5. FILTRO MÓDULO */}
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'module' ? null : 'module')}
+                className="w-full flex justify-between items-center px-3.5 py-2 text-xs font-medium bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-700"
+              >
+                <span className="truncate">Módulo {selectedModules.length > 0 && `(${selectedModules.length})`}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+              </button>
+              {openDropdown === 'module' && (
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2 space-y-1">
+                  {allModules.map(module => (
+                    <label key={module} className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded text-xs cursor-pointer text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={selectedModules.includes(module)}
+                        onChange={() => toggleFilterItem(selectedModules, setSelectedModules, module)}
+                        className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
+                      />
+                      <span className="truncate">{module}</span>
+                    </label>
+                  ))}
+                  {allModules.length === 0 && <p className="text-xs text-gray-400 p-2 text-center">No hay módulos</p>}
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* LISTA PRINCIPAL (Grid de tarjetas resumen) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {books.map((book) => {
+        {filteredBooks.map((book) => {
           const authorNames = book.book_authors
             .map(ba => ba.authors?.name)
             .filter(Boolean)
@@ -191,9 +448,9 @@ export default function BooksClient({
         })}
       </div>
 
-      {books.length === 0 && (
+      {filteredBooks.length === 0 && (
         <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4 shadow-sm">
-          <p className="text-gray-500">No se ha encontrado ningún libro con ese título</p>
+          <p className="text-gray-500">No se ha encontrado ningún libro con los filtros seleccionados</p>
         </div>
       )}
 
