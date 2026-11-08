@@ -70,7 +70,11 @@ export default async function HomePage() {
               <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <VisualShelf shelvesList={shelvesData || []} layout={DESK_LAYOUT} />
+          <VisualShelf 
+            shelvesList={shelvesData || []} 
+            layout={DESK_LAYOUT} 
+            gridCols="grid-cols-[repeat(13,5.2rem)]" 
+          />
         </section>
 
         {/* HABITACIÓN 2: BUHARDILLA */}
@@ -78,7 +82,11 @@ export default async function HomePage() {
           <div className="flex justify-between items-end mb-4">
             <h2 className="text-xl font-bold text-gray-900">Buhardilla</h2>
           </div>
-          <VisualShelf shelvesList={shelvesData || []} layout={BUHARDILLA_LAYOUT} />
+          <VisualShelf 
+            shelvesList={shelvesData || []} 
+            layout={BUHARDILLA_LAYOUT} 
+            gridCols="grid-cols-[repeat(3,5.2rem)]" 
+          />
         </section>
 
         {/* ÚLTIMOS LIBROS AÑADIDOS */}

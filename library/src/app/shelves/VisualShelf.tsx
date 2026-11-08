@@ -9,7 +9,7 @@ type Shelf = {
   books: any[]
 }
 
-// Layout por defecto (El Despacho actual)
+// Layout Despacho
 export const DESK_LAYOUT = [
   // FILA 1
   { slotName: 'D-1.1', className: 'col-span-2' },
@@ -49,18 +49,15 @@ export const DESK_LAYOUT = [
   { slotName: 'D-5.3', className: 'col-span-3' },
 ]
 
-// Ejemplo de otra habitación diferente (por ejemplo, "Salón" o "Biblioteca auxiliar")
+// Layout Buhardilla
 export const BUHARDILLA_LAYOUT = [
-  // FILA 1 (Empezando en columna 2)
   { slotName: 'B-1.2', className: 'col-start-2 row-start-1' },
   { slotName: 'B-1.3', className: 'col-start-3 row-start-1' },
 
-  // FILA 2
   { slotName: 'B-2.1', className: 'col-start-1 row-start-2' },
   { slotName: 'B-2.2', className: 'col-start-2 row-start-2' },
   { slotName: 'B-2.3', className: 'col-start-3 row-start-2' },
 
-  // FILA 3
   { slotName: 'B-3.1', className: 'col-start-1 row-start-3' },
   { slotName: 'B-3.2', className: 'col-start-2 row-start-3' },
   { slotName: 'B-3.3', className: 'col-start-3 row-start-3' },
@@ -68,15 +65,19 @@ export const BUHARDILLA_LAYOUT = [
 
 type VisualShelfProps = {
   shelvesList: Shelf[]
-  layout?: typeof DESK_LAYOUT // Permite pasar cualquier distribución
+  layout?: typeof DESK_LAYOUT
+  gridCols?: string 
 }
 
-export default function VisualShelf({ shelvesList, layout = DESK_LAYOUT }: VisualShelfProps) {
+export default function VisualShelf({ 
+  shelvesList, 
+  layout = DESK_LAYOUT, 
+  gridCols = "grid-cols-[repeat(13,5.2rem)]" 
+}: VisualShelfProps) {
   return (
-    <div className="w-full bg-white p-8 rounded-xl shadow-sm border border-gray-200 overflow-x-auto mb-8">
+    <div className="w-full bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-200 overflow-x-auto mb-8 flex justify-center max-w-full">
       
-      {/* Contenedor Grid */}
-      <div className="min-w-[1000px] aspect-[13/5] bg-gray-900 border-8 border-gray-900 grid grid-cols-13 gap-1.5 p-1.5 shadow-inner rounded-lg">
+      <div className={`bg-gray-900 border-8 border-gray-900 grid ${gridCols} auto-rows-[5.2rem] gap-1.5 p-1.5 shadow-inner rounded-lg inline-grid`}>
         
         {layout.map((cell) => {
           const matchedShelf = shelvesList.find(s => s.name === cell.slotName)
@@ -88,6 +89,7 @@ export default function VisualShelf({ shelvesList, layout = DESK_LAYOUT }: Visua
               key={cell.slotName}
               className={`
                 relative flex flex-col items-center justify-center p-2 text-center transition-all duration-200 rounded-md group overflow-hidden
+                w-full h-full
                 ${matchedShelf 
                   ? 'bg-amber-50 border border-amber-200/80 hover:border-amber-400 hover:bg-amber-100/80 cursor-pointer shadow-sm' 
                   : 'bg-gray-100 border border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-200/70 cursor-pointer'} 
