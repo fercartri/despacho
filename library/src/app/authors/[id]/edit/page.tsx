@@ -41,6 +41,7 @@ export default async function EditAuthorPage({
               name="name"
               type="text"
               required
+              autoFocus
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-black"
               placeholder="Ej: J. K. Rowling"
               defaultValue={author.name}

@@ -41,6 +41,7 @@ export default async function EditShelfPage({
               name="name"
               type="text"
               required
+              autoFocus
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-black"
               placeholder="Ej: 1.1"
               defaultValue={shelf.name}
