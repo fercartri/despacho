@@ -12,50 +12,58 @@ type Shelf = {
 // Layout por defecto (El Despacho actual)
 export const DESK_LAYOUT = [
   // FILA 1
-  { slotName: '1.1', className: 'col-span-2' },
-  { slotName: '1.2', className: 'col-span-2' },
-  { slotName: '1.3', className: 'row-span-2' },
-  { slotName: '1.4', className: 'col-span-2 row-span-2' },
-  { slotName: '1.5', className: 'col-span-2' },
-  { slotName: '1.6', className: 'col-span-2' },
-  { slotName: '1.7', className: 'col-span-2' },
+  { slotName: 'D-1.1', className: 'col-span-2' },
+  { slotName: 'D-1.2', className: 'col-span-2' },
+  { slotName: 'D-1.3', className: 'row-span-2' },
+  { slotName: 'D-1.4', className: 'col-span-2 row-span-2' },
+  { slotName: 'D-1.5', className: 'col-span-2' },
+  { slotName: 'D-1.6', className: 'col-span-2' },
+  { slotName: 'D-1.7', className: 'col-span-2' },
 
   // FILA 2
-  { slotName: '2.1', className: ''},
-  { slotName: '2.2', className: 'col-span-3' },
-  { slotName: '2.3', className: 'col-span-4' },
-  { slotName: '2.4', className: ''},
-  { slotName: '2.5', className: 'row-span-2' },
+  { slotName: 'D-2.1', className: ''},
+  { slotName: 'D-2.2', className: 'col-span-3' },
+  { slotName: 'D-2.3', className: 'col-span-4' },
+  { slotName: 'D-2.4', className: ''},
+  { slotName: 'D-2.5', className: 'row-span-2' },
 
   // FILA 3
-  { slotName: '3.1', className: 'row-span-2' },
-  { slotName: '3.2', className: 'col-span-2' },
-  { slotName: '3.3', className: 'col-span-2' },
-  { slotName: '3.4', className: 'col-span-2' },
-  { slotName: '3.5', className: 'col-span-2' },
-  { slotName: '3.6', className: 'col-span-3' },
+  { slotName: 'D-3.1', className: 'row-span-2' },
+  { slotName: 'D-3.2', className: 'col-span-2' },
+  { slotName: 'D-3.3', className: 'col-span-2' },
+  { slotName: 'D-3.4', className: 'col-span-2' },
+  { slotName: 'D-3.5', className: 'col-span-2' },
+  { slotName: 'D-3.6', className: 'col-span-3' },
 
   // FILA 4
-  { slotName: '4.1', className: 'col-span-2' },
-  { slotName: '4.2', className: 'col-span-2 row-span-2' },
-  { slotName: '4.3', className: '' },
-  { slotName: '4.4', className: 'col-span-2' },
-  { slotName: '4.5', className: 'col-span-3' },
-  { slotName: '4.6', className: 'col-span-2 row-span-2' },
+  { slotName: 'D-4.1', className: 'col-span-2' },
+  { slotName: 'D-4.2', className: 'col-span-2 row-span-2' },
+  { slotName: 'D-4.3', className: '' },
+  { slotName: 'D-4.4', className: 'col-span-2' },
+  { slotName: 'D-4.5', className: 'col-span-3' },
+  { slotName: 'D-4.6', className: 'col-span-2 row-span-2' },
 
   // FILA 5
-  { slotName: '5.1', className: 'col-span-3' },
-  { slotName: '5.2', className: 'col-span-3' },
-  { slotName: '5.3', className: 'col-span-3' },
+  { slotName: 'D-5.1', className: 'col-span-3' },
+  { slotName: 'D-5.2', className: 'col-span-3' },
+  { slotName: 'D-5.3', className: 'col-span-3' },
 ]
 
 // Ejemplo de otra habitación diferente (por ejemplo, "Salón" o "Biblioteca auxiliar")
-export const LIVING_ROOM_LAYOUT = [
-  { slotName: 'L.1', className: 'col-span-4 row-span-2' },
-  { slotName: 'L.2', className: 'col-span-4 row-span-2' },
-  { slotName: 'L.3', className: 'col-span-5 row-span-2' },
-  { slotName: 'L.4', className: 'col-span-6' },
-  { slotName: 'L.5', className: 'col-span-7' },
+export const BUHARDILLA_LAYOUT = [
+  // FILA 1 (Empezando en columna 2)
+  { slotName: 'B-1.2', className: 'col-start-2 row-start-1' },
+  { slotName: 'B-1.3', className: 'col-start-3 row-start-1' },
+
+  // FILA 2
+  { slotName: 'B-2.1', className: 'col-start-1 row-start-2' },
+  { slotName: 'B-2.2', className: 'col-start-2 row-start-2' },
+  { slotName: 'B-2.3', className: 'col-start-3 row-start-2' },
+
+  // FILA 3
+  { slotName: 'B-3.1', className: 'col-start-1 row-start-3' },
+  { slotName: 'B-3.2', className: 'col-start-2 row-start-3' },
+  { slotName: 'B-3.3', className: 'col-start-3 row-start-3' },
 ]
 
 type VisualShelfProps = {

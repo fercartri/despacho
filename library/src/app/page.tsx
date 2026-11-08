@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { Book, ChevronRight, UserCheck } from "lucide-react";
-import VisualShelf, { DESK_LAYOUT, LIVING_ROOM_LAYOUT } from "@/app/shelves/VisualShelf";
+import VisualShelf, { DESK_LAYOUT, BUHARDILLA_LAYOUT } from "@/app/shelves/VisualShelf";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -42,7 +42,7 @@ export default async function HomePage() {
           <h1 className="text-3xl font-bold text-gray-900">Biblioteca</h1>
         </div>
 
-        {/* 4 TARJETAS DE ESTADÍSTICAS */}
+        {/* ESTADÍSTICAS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
             <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center"><Book /></div>
@@ -64,10 +64,7 @@ export default async function HomePage() {
         {/* HABITACIÓN 1: DESPACHO */}
         <section>
           <div className="flex justify-between items-end mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Estantería - Despacho</h2>
-              <p className="text-xs text-gray-500">Distribución principal de trabajo</p>
-            </div>
+            <h2 className="text-xl font-bold text-gray-900">Despacho</h2>
             <Link href="/shelves" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
               Gestionar estanterías
               <ChevronRight className="w-4 h-4" />
@@ -76,15 +73,12 @@ export default async function HomePage() {
           <VisualShelf shelvesList={shelvesData || []} layout={DESK_LAYOUT} />
         </section>
 
-        {/* HABITACIÓN 2: SALÓN (Ejemplo de nueva habitación con otra distribución) */}
+        {/* HABITACIÓN 2: BUHARDILLA */}
         <section>
           <div className="flex justify-between items-end mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Estantería - Salón</h2>
-              <p className="text-xs text-gray-500">Módulos auxiliares de lectura</p>
-            </div>
+            <h2 className="text-xl font-bold text-gray-900">Buhardilla</h2>
           </div>
-          <VisualShelf shelvesList={shelvesData || []} layout={LIVING_ROOM_LAYOUT} />
+          <VisualShelf shelvesList={shelvesData || []} layout={BUHARDILLA_LAYOUT} />
         </section>
 
         {/* ÚLTIMOS LIBROS AÑADIDOS */}
