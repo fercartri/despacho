@@ -9,7 +9,8 @@ type Shelf = {
   books: any[]
 }
 
-const HARDCODED_LAYOUT = [
+// Layout por defecto (El Despacho actual)
+export const DESK_LAYOUT = [
   // FILA 1
   { slotName: '1.1', className: 'col-span-2' },
   { slotName: '1.2', className: 'col-span-2' },
@@ -48,14 +49,28 @@ const HARDCODED_LAYOUT = [
   { slotName: '5.3', className: 'col-span-3' },
 ]
 
-export default function VisualShelf({ shelvesList }: { shelvesList: Shelf[] }) {
+// Ejemplo de otra habitación diferente (por ejemplo, "Salón" o "Biblioteca auxiliar")
+export const LIVING_ROOM_LAYOUT = [
+  { slotName: 'L.1', className: 'col-span-4 row-span-2' },
+  { slotName: 'L.2', className: 'col-span-4 row-span-2' },
+  { slotName: 'L.3', className: 'col-span-5 row-span-2' },
+  { slotName: 'L.4', className: 'col-span-6' },
+  { slotName: 'L.5', className: 'col-span-7' },
+]
+
+type VisualShelfProps = {
+  shelvesList: Shelf[]
+  layout?: typeof DESK_LAYOUT // Permite pasar cualquier distribución
+}
+
+export default function VisualShelf({ shelvesList, layout = DESK_LAYOUT }: VisualShelfProps) {
   return (
     <div className="w-full bg-white p-8 rounded-xl shadow-sm border border-gray-200 overflow-x-auto mb-8">
       
-      {/* Contenedor Grid: Marco exterior neutro */}
+      {/* Contenedor Grid */}
       <div className="min-w-[1000px] aspect-[13/5] bg-gray-900 border-8 border-gray-900 grid grid-cols-13 gap-1.5 p-1.5 shadow-inner rounded-lg">
         
-        {HARDCODED_LAYOUT.map((cell) => {
+        {layout.map((cell) => {
           const matchedShelf = shelvesList.find(s => s.name === cell.slotName)
           const isEmpty = matchedShelf ? matchedShelf.books.length === 0 : true
           const bookCount = matchedShelf ? matchedShelf.books.length : 0
@@ -72,7 +87,6 @@ export default function VisualShelf({ shelvesList }: { shelvesList: Shelf[] }) {
               `}
               title={matchedShelf ? `Módulo ${matchedShelf.name}` : `Hueco libre (${cell.slotName}) - Haz clic para crearlo`}
             >
-              {/* Etiqueta flotante con el slot */}
               <span className={`text-[10px] font-mono font-bold absolute top-1.5 left-2 transition-colors ${
                 matchedShelf ? 'text-amber-800/60 group-hover:text-amber-900' : 'text-gray-400 group-hover:text-gray-600'
               }`}>
@@ -81,7 +95,6 @@ export default function VisualShelf({ shelvesList }: { shelvesList: Shelf[] }) {
 
               {matchedShelf ? (
                 <>
-                  {/* Hueco ocupado por un Módulo activo */}
                   <div className="flex flex-col items-center justify-center gap-1 mt-1">
                     <span className="text-gray-800 group-hover:scale-110 transition-transform">
                       <BookCopy className="w-5 h-5 text-amber-800" />
@@ -95,7 +108,6 @@ export default function VisualShelf({ shelvesList }: { shelvesList: Shelf[] }) {
                     </span>
                   </div>
 
-                  {/* Tooltip/Badge al hacer hover */}
                   <div className="absolute inset-x-0 bottom-0 py-0.5 bg-amber-200 text-[9px] font-semibold text-amber-700 text-center opacity-0 group-hover:opacity-100 transition-opacity border-t border-amber-300 flex items-center gap-1 justify-center">
                     <Eye className="w-4 h-4" />Ver módulo
                   </div>
@@ -108,14 +120,12 @@ export default function VisualShelf({ shelvesList }: { shelvesList: Shelf[] }) {
                 </>
               ) : (
                 <>
-                  {/* Hueco Libre (Estilo Claro) */}
                   <div className="flex flex-col items-center justify-center gap-1 mt-1 text-gray-400 group-hover:text-gray-600 transition-colors">
                     <span className="text-[10px] font-medium tracking-wider uppercase text-gray-400 group-hover:text-gray-700 transition-colors">
                       Disponible
                     </span>
                   </div>
 
-                  {/* Tooltip/Badge claro al hacer hover */}
                   <div className="absolute inset-x-0 bottom-0 py-0.5 bg-gray-200 text-[9px] font-semibold text-gray-700 text-center opacity-0 group-hover:opacity-100 transition-opacity border-t border-gray-300 flex items-center gap-1 justify-center">
                     <Plus className="w-4 h-4" />Crear módulo
                   </div>
