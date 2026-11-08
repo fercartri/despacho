@@ -19,17 +19,17 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
   const [isOpen, setIsOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  
+  // Referencias para los elementos de la lista desplegable (para el autoscroll)
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([])
 
-  // Opciones que coinciden con la búsqueda Y que aún NO han sido seleccionadas
   const filteredOptions = options.filter(opt => 
-    opt.name.toLowerCase().includes(search.toLowerCase() ) && 
+    opt.name.toLowerCase().includes(search.toLowerCase()) && 
     !selectedIds.includes(opt.id)
   )
 
-  // Los objetos completos de las opciones ya seleccionadas (para pintar las píldoras)
   const selectedOptions = options.filter(opt => selectedIds.includes(opt.id))
 
-  // Cierra el desplegable si hacemos clic fuera de él
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -40,10 +40,19 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // Restablecer el índice resaltado cuando cambia la lista filtrada
   useEffect(() => {
     setHighlightedIndex(0)
   }, [search])
+
+  // --- AUTOSCROLL EFECTO ---
+  useEffect(() => {
+    if (isOpen && itemRefs.current[highlightedIndex]) {
+      itemRefs.current[highlightedIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      })
+    }
+  }, [highlightedIndex, isOpen])
 
   const handleSelect = (id: string) => {
     onChange([...selectedIds, id])
@@ -60,7 +69,6 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
     setIsOpen(false)
   }
 
-  // Manejo de navegación por teclado en el input de búsqueda
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       setIsOpen(true)
@@ -92,7 +100,6 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
   return (
     <div className="relative w-full" ref={wrapperRef}>
       
-      {/* 1. Zona de Píldoras Seleccionadas */}
       {selectedOptions.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
           {selectedOptions.map(opt => (
@@ -110,7 +117,6 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
         </div>
       )}
 
-      {/* 2. Barra de Búsqueda con soporte de Teclado */}
       <div className="relative">
         <input
           type="text"
@@ -135,7 +141,6 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
         )}
       </div>
 
-      {/* 3. Menú Desplegable con opciones navegables */}
       {isOpen && (search || filteredOptions.length > 0) && (
         <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredOptions.length > 0 ? (
@@ -144,6 +149,7 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
               return (
                 <li 
                   key={opt.id}
+                  ref={(el) => { itemRefs.current[index] = el }}
                   onClick={() => handleSelect(opt.id)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                   className={`px-4 py-2 cursor-pointer border-b border-gray-50 last:border-0 transition-colors ${

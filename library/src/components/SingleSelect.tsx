@@ -23,6 +23,9 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
   const [highlightedIndex, setHighlightedIndex] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
+  // Referencias para el autoscroll de la lista
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([])
+
   useEffect(() => {
     if (defaultValue) {
       const found = options.find(opt => opt.id === defaultValue)
@@ -36,10 +39,19 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
     opt.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  // Resetear el índice resaltado al escribir o buscar
   useEffect(() => {
     setHighlightedIndex(0)
   }, [search])
+
+  // --- AUTOSCROLL EFECTO ---
+  useEffect(() => {
+    if (isOpen && itemRefs.current[highlightedIndex]) {
+      itemRefs.current[highlightedIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      })
+    }
+  }, [highlightedIndex, isOpen])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -65,7 +77,6 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
     if (onChange) onChange(null)
   }
 
-  // Manejo de eventos de teclado (Flechas y Enter)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       setIsOpen(true)
@@ -145,6 +156,7 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
               return (
                 <li 
                   key={opt.id}
+                  ref={(el) => { itemRefs.current[index] = el }}
                   onClick={() => handleSelect(opt)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                   className={`px-4 py-2 cursor-pointer border-b border-gray-50 last:border-0 transition-colors ${
