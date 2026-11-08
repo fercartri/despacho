@@ -51,16 +51,53 @@ export const DESK_LAYOUT = [
 
 // Layout Buhardilla
 export const BUHARDILLA_LAYOUT = [
-  { slotName: 'B-1.2', className: 'col-start-2 row-start-1' },
-  { slotName: 'B-1.3', className: 'col-start-3 row-start-1' },
+  // FILA 1 (empezando en columna 2)
+  { slotName: 'B-1.2', className: 'col-start-2' },
+  { slotName: 'B-1.3', className: 'col-start-3' },
 
-  { slotName: 'B-2.1', className: 'col-start-1 row-start-2' },
-  { slotName: 'B-2.2', className: 'col-start-2 row-start-2' },
-  { slotName: 'B-2.3', className: 'col-start-3 row-start-2' },
+  // FILA 2
+  { slotName: 'B-2.1', className: '' },
+  { slotName: 'B-2.2', className: '' },
+  { slotName: 'B-2.3', className: '' },
 
-  { slotName: 'B-3.1', className: 'col-start-1 row-start-3' },
-  { slotName: 'B-3.2', className: 'col-start-2 row-start-3' },
-  { slotName: 'B-3.3', className: 'col-start-3 row-start-3' },
+  // FILA 3
+  { slotName: 'B-3.1', className: '' },
+  { slotName: 'B-3.2', className: '' },
+  { slotName: 'B-3.3', className: '' },
+]
+
+// Layout Fernando
+export const FERNANDO_LAYOUT = [
+  // FILA 1
+  { slotName: 'F-1.1', className: 'col-start-1 col-span-3 row-start-1' },
+  { slotName: 'F-1.2', className: 'col-start-4 col-span-3 row-start-1' },
+  { slotName: 'F-1.3', className: 'col-start-7 col-span-3 row-start-1' },
+
+  // FILA 2
+  { slotName: 'F-2.1', className: 'col-start-1 col-span-3 row-start-2' },
+  { slotName: 'F-2.2', className: 'col-start-4 col-span-3 row-start-2' },
+  { slotName: 'F-2.3', className: 'col-start-7 col-span-3 row-start-2' },
+
+  // FILA 3
+  { slotName: 'F-3.1', className: 'col-start-1 col-span-3 row-start-3' },
+  { slotName: 'F-3.2', className: 'col-start-4 col-span-3 row-start-3 row-span-2' },
+  { slotName: 'F-3.3', className: 'col-start-7 col-span-3 row-start-3' },
+
+  // FILA 4
+  { slotName: 'F-4.1', className: 'col-start-1 col-span-3 row-start-4' },
+  { slotName: 'F-4.2', className: 'col-start-7 col-span-3 row-start-4 row-span-2' },
+
+  // FILA 5
+  { slotName: 'F-5.1', className: 'col-start-1 col-span-3 row-start-5' },
+  { slotName: 'F-5.2', className: 'col-start-4 col-span-3 row-start-5' },
+
+  // FILA 6
+  { slotName: 'F-6.1', className: 'col-start-1 col-span-3 row-start-6' },
+  { slotName: 'F-6.2', className: 'col-start-4 col-span-3 row-start-6' },
+
+  // FILA 7
+  { slotName: 'F-7.1', className: 'col-start-1 col-span-3 row-start-7' },
+  { slotName: 'F-7.2', className: 'col-start-4 col-span-3 row-start-7' },
 ]
 
 type VisualShelfProps = {

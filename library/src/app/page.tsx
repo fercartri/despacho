@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { Book, ChevronRight, UserCheck } from "lucide-react";
-import VisualShelf, { DESK_LAYOUT, BUHARDILLA_LAYOUT } from "@/app/shelves/VisualShelf";
+import VisualShelf, { DESK_LAYOUT, BUHARDILLA_LAYOUT, FERNANDO_LAYOUT } from "@/app/shelves/VisualShelf";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -86,6 +86,18 @@ export default async function HomePage() {
             shelvesList={shelvesData || []} 
             layout={BUHARDILLA_LAYOUT} 
             gridCols="grid-cols-[repeat(3,5.2rem)]" 
+          />
+        </section>
+
+        {/* HABITACIÓN 3: FERNANDO */}
+        <section>
+          <div className="flex justify-between items-end mb-4">
+            <h2 className="text-xl font-bold text-gray-900">Fernando</h2>
+          </div>
+          <VisualShelf 
+            shelvesList={shelvesData || []} 
+            layout={FERNANDO_LAYOUT} 
+            gridCols="grid-cols-[repeat(9,5.2rem)]" 
           />
         </section>
 
