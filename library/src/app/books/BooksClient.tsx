@@ -29,11 +29,21 @@ export type FullBook = {
 export default function BooksClient({ 
   books, 
   targetBook, 
-  initialQuery 
+  initialQuery,
+  allAuthors,
+  allPublishers,
+  allGenres,
+  allSeries,
+  allModules
 }: { 
   books: FullBook[]; 
   targetBook: FullBook | null;
   initialQuery: string;
+  allAuthors: string[];
+  allPublishers: string[];
+  allGenres: string[];
+  allSeries: string[];
+  allModules: string[];
 }) {
   const [selectedBook, setSelectedBook] = useState<FullBook | null>(null)
   const [searchQuery, setSearchQuery] = useState(initialQuery)
@@ -139,13 +149,6 @@ export default function BooksClient({
       router.replace(`/books${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false });
     });
   }
-
-  // Listas de opciones para los desplegables (basadas en los libros actuales de la página)
-  const allAuthors = Array.from(new Set(books.flatMap(b => b.book_authors.map(ba => ba.authors?.name).filter(Boolean)))) as string[];
-  const allPublishers = Array.from(new Set(books.map(b => b.publishers?.name).filter(Boolean))) as string[];
-  const allGenres = Array.from(new Set(books.flatMap(b => b.book_genres.map(bg => bg.genres?.name).filter(Boolean)))) as string[];
-  const allSeries = Array.from(new Set(books.map(b => b.series?.name).filter(Boolean))) as string[];
-  const allModules = Array.from(new Set(books.map(b => b.shelf_modules?.name).filter(Boolean))) as string[];
 
   // Funciones de selección de checkboxes que actualizan el estado y sincronizan la URL
   const toggleFilterItem = (

@@ -30,11 +30,10 @@ export default async function BooksPage({
   const selectedPublishers = params?.publisher ? params.publisher.split(",") : [];
   const selectedModules = params?.module ? params.module.split(",") : [];
 
-  // Configuración de la paginación
   const PAGE_SIZE = 20;
   const currentPage = Number(params?.page) || 1;
 
-  // Consultamos todos los libros sin paginación previa para poder ordenarlos y filtrarlos globalmente de forma segura
+  // 1. Consultar TODOS los libros para filtrado y ordenación global exacta
   let query = supabase
     .from("books")
     .select(`
@@ -72,7 +71,7 @@ export default async function BooksPage({
 
   let allBooks = (data as unknown as FullBook[]) || [];
 
-  // 1. APLICAR FILTROS EN EL SERVIDOR (sobre el total de libros)
+  // 2. APLICAR FILTROS EN EL SERVIDOR
   if (selectedSeries.length > 0) {
     allBooks = allBooks.filter(b => b.series?.name && selectedSeries.includes(b.series.name));
   }
@@ -95,10 +94,8 @@ export default async function BooksPage({
     });
   }
 
-  // 2. ORDENACIÓN JERÁRQUICA GLOBAL EN EL SERVIDOR
-  // Criterio: Módulo > Saga > Posición en saga > Título
+  // 3. ORDENACIÓN JERÁRQUICA GLOBAL (Módulo > Saga > Posición > Título)
   allBooks.sort((a, b) => {
-    // A. Módulo (Los asignados van primero, los null al final)
     const modA = a.shelf_modules?.name || '';
     const modB = b.shelf_modules?.name || '';
     if (modA !== modB) {
@@ -107,7 +104,6 @@ export default async function BooksPage({
       return modA.localeCompare(modB);
     }
 
-    // B. Saga (Los asignados van primero, los null al final)
     const seriesA = a.series?.name || '';
     const seriesB = b.series?.name || '';
     if (seriesA !== seriesB) {
@@ -116,24 +112,42 @@ export default async function BooksPage({
       return seriesA.localeCompare(seriesB);
     }
 
-    // C. Posición en la saga (Numérica ascendente, nulls al final)
     const posA = a.position_in_series ?? 999999;
     const posB = b.position_in_series ?? 999999;
     if (posA !== posB) {
       return posA - posB;
     }
 
-    // D. Título alfabéticamente
     return (a.title || '').localeCompare(b.title || '');
   });
 
-  // 3. PAGINACIÓN GLOBAL
+  // 4. OBTENER LISTAS MAESTRAS COMPLETAS DE LA BASE DE DATOS PARA LOS FILTROS
+  const [
+    { data: authorsData },
+    { data: publishersData },
+    { data: genresData },
+    { data: seriesData },
+    { data: modulesData }
+  ] = await Promise.all([
+    supabase.from("authors").select("name").order("name", { ascending: true }),
+    supabase.from("publishers").select("name").order("name", { ascending: true }),
+    supabase.from("genres").select("name").order("name", { ascending: true }),
+    supabase.from("series").select("name").order("name", { ascending: true }),
+    supabase.from("shelf_modules").select("name").order("name", { ascending: true }),
+  ]);
+
+  const allAuthors = authorsData?.map(a => a.name).filter(Boolean) || [];
+  const allPublishers = publishersData?.map(p => p.name).filter(Boolean) || [];
+  const allGenres = genresData?.map(g => g.name).filter(Boolean) || [];
+  const allSeries = seriesData?.map(s => s.name).filter(Boolean) || [];
+  const allModules = modulesData?.map(m => m.name).filter(Boolean) || [];
+
+  // 5. PAGINACIÓN GLOBAL
   const totalBooks = allBooks.length;
   const totalPages = Math.ceil(totalBooks / PAGE_SIZE) || 1;
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const paginatedBooks = allBooks.slice(startIndex, startIndex + PAGE_SIZE);
 
-  // Búsqueda de libro específico para el modal
   let targetBook = null;
   if (targetBookId) {
     const { data: foundBook } = await supabase
@@ -148,7 +162,6 @@ export default async function BooksPage({
     targetBook = foundBook;
   }
 
-  // Helper para mantener los parámetros en los enlaces de paginación
   const createPageUrl = (pageNumber: number) => {
     const p = new URLSearchParams();
     if (pageNumber > 1) p.set("page", pageNumber.toString());
@@ -171,16 +184,17 @@ export default async function BooksPage({
           books={paginatedBooks} 
           targetBook={targetBook as unknown as FullBook | null} 
           initialQuery={searchQuery}
+          allAuthors={allAuthors}
+          allPublishers={allPublishers}
+          allGenres={allGenres}
+          allSeries={allSeries}
+          allModules={allModules}
         />
 
-        {/* Controles de paginación */}
         {totalPages > 1 && (
           <div className="flex justify-between items-center mt-12 bg-white px-6 py-4 rounded-xl border border-gray-200 shadow-sm">
             {currentPage > 1 ? (
-              <Link
-                href={createPageUrl(currentPage - 1)}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
+              <Link href={createPageUrl(currentPage - 1)} className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
                 <ChevronLeft className="w-4 h-4" /> Anterior
               </Link>
             ) : (
@@ -195,10 +209,7 @@ export default async function BooksPage({
             </span>
 
             {currentPage < totalPages ? (
-              <Link
-                href={createPageUrl(currentPage + 1)}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
+              <Link href={createPageUrl(currentPage + 1)} className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
                 Siguiente <ChevronRight className="w-4 h-4" />
               </Link>
             ) : (
