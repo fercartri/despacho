@@ -71,7 +71,7 @@ export default function NewBookForm({ authors, genres, publishers, series, shelv
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">Título *</label>
-          <input id="title" name="title" type="text" required className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
+          <input id="title" name="title" type="text" required autoFocus className="w-full px-3 py-2 border border-gray-300 rounded-md text-black shadow-sm" />
         </div>
 
         <div>

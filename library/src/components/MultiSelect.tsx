@@ -8,27 +8,28 @@ type Option = {
 }
 
 type Props = {
-  options: Option[]           // Todos los datos de la base de datos (ej: todos los autores)
-  selectedIds: string[]       // Los IDs que ya hemos seleccionado
-  onChange: (ids: string[]) => void // Función para avisar al formulario de los cambios
+  options: Option[]
+  selectedIds: string[]
+  onChange: (ids: string[]) => void
   placeholder?: string
 }
 
 export default function MultiSelect({ options, selectedIds, onChange, placeholder = "Buscar..." }: Props) {
   const [search, setSearch] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  
+  // Referencias para los elementos de la lista desplegable (para el autoscroll)
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([])
 
-  // Opciones que coinciden con la búsqueda Y que aún NO han sido seleccionadas
   const filteredOptions = options.filter(opt => 
     opt.name.toLowerCase().includes(search.toLowerCase()) && 
     !selectedIds.includes(opt.id)
   )
 
-  // Los objetos completos de las opciones que ya hemos seleccionado (para pintar las píldoras)
   const selectedOptions = options.filter(opt => selectedIds.includes(opt.id))
 
-  // Cierra el desplegable si hacemos clic fuera de él
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -39,10 +40,24 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    setHighlightedIndex(0)
+  }, [search])
+
+  // --- AUTOSCROLL EFECTO ---
+  useEffect(() => {
+    if (isOpen && itemRefs.current[highlightedIndex]) {
+      itemRefs.current[highlightedIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      })
+    }
+  }, [highlightedIndex, isOpen])
+
   const handleSelect = (id: string) => {
     onChange([...selectedIds, id])
-    setSearch('') // Limpiamos la búsqueda al seleccionar
-    setIsOpen(true) // Mantenemos abierto por si quiere elegir otro
+    setSearch('')
+    setIsOpen(true)
   }
 
   const handleRemove = (idToRemove: string) => {
@@ -54,10 +69,37 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
     setIsOpen(false)
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      setIsOpen(true)
+      return
+    }
+
+    if (!isOpen) return
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlightedIndex(prev => 
+        prev < filteredOptions.length - 1 ? prev + 1 : 0
+      )
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlightedIndex(prev => 
+        prev > 0 ? prev - 1 : filteredOptions.length - 1
+      )
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      if (filteredOptions[highlightedIndex]) {
+        handleSelect(filteredOptions[highlightedIndex].id)
+      }
+    } else if (e.key === 'Escape') {
+      setIsOpen(false)
+    }
+  }
+
   return (
     <div className="relative w-full" ref={wrapperRef}>
       
-      {/* 1. Zona de Píldoras Seleccionadas */}
       {selectedOptions.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
           {selectedOptions.map(opt => (
@@ -75,7 +117,6 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
         </div>
       )}
 
-      {/* 2. Barra de Búsqueda */}
       <div className="relative">
         <input
           type="text"
@@ -85,10 +126,10 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
             setIsOpen(true)
           }}
           onFocus={() => setIsOpen(true)}
+          onKeyDown={handleKeyDown}
           placeholder={selectedOptions.length === 0 ? placeholder : "Buscar más..."}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800 text-black pr-10"
         />
-        {/* Cruz para limpiar la búsqueda si hay texto */}
         {search && (
           <button
             type="button"
@@ -100,19 +141,25 @@ export default function MultiSelect({ options, selectedIds, onChange, placeholde
         )}
       </div>
 
-      {/* 3. Menú Desplegable con las opciones filtradas */}
       {isOpen && (search || filteredOptions.length > 0) && (
         <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredOptions.length > 0 ? (
-            filteredOptions.map(opt => (
-              <li 
-                key={opt.id}
-                onClick={() => handleSelect(opt.id)}
-                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-gray-800 border-b border-gray-50 last:border-0"
-              >
-                {opt.name}
-              </li>
-            ))
+            filteredOptions.map((opt, index) => {
+              const isHighlighted = index === highlightedIndex
+              return (
+                <li 
+                  key={opt.id}
+                  ref={(el) => { itemRefs.current[index] = el }}
+                  onClick={() => handleSelect(opt.id)}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  className={`px-4 py-2 cursor-pointer border-b border-gray-50 last:border-0 transition-colors ${
+                    isHighlighted ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-800 hover:bg-gray-50'
+                  }`}
+                >
+                  {opt.name}
+                </li>
+              )
+            })
           ) : (
             <li className="px-4 py-3 text-gray-500 text-sm italic text-center">
               No se encontraron resultados para "{search}"
