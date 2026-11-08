@@ -8,31 +8,33 @@ export const dynamic = 'force-dynamic';
 export default async function BooksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; bookId?: string; q?: string }>;
+  searchParams: Promise<{ 
+    page?: string; 
+    bookId?: string; 
+    q?: string; 
+    series?: string; 
+    author?: string; 
+    genre?: string; 
+    publisher?: string;
+    module?: string;
+  }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
 
   const targetBookId = params?.bookId;
   const searchQuery = params?.q?.trim() || "";
+  const selectedSeries = params?.series ? params.series.split(",") : [];
+  const selectedAuthors = params?.author ? params.author.split(",") : [];
+  const selectedGenres = params?.genre ? params.genre.split(",") : [];
+  const selectedPublishers = params?.publisher ? params.publisher.split(",") : [];
+  const selectedModules = params?.module ? params.module.split(",") : [];
 
   // Configuración de la paginación
   const PAGE_SIZE = 20;
   const currentPage = Number(params?.page) || 1;
-  const from = (currentPage - 1) * PAGE_SIZE;
-  const to = from + PAGE_SIZE - 1;
 
-  // 1. Conteo total de libros con filtro opcional por título
-  let countQuery = supabase.from("books").select("*", { count: "exact", head: true });
-  if (searchQuery) {
-    countQuery = countQuery.ilike("title", `%${searchQuery}%`);
-  }
-
-  const { count } = await countQuery;
-  const totalBooks = count || 0;
-  const totalPages = Math.ceil(totalBooks / PAGE_SIZE) || 1;
-
-  // 2. Consulta principal de libros con ordenación jerárquica y filtro por título
+  // Consultamos todos los libros sin paginación previa para poder ordenarlos y filtrarlos globalmente de forma segura
   let query = supabase
     .from("books")
     .select(`
@@ -52,47 +54,13 @@ export default async function BooksPage({
       shelf_modules (name),
       book_authors (authors (name)),
       book_genres (genres (name))
-    `)
-    .order("name", { referencedTable: "shelf_modules", ascending: true, nullsFirst: false })
-    .order("name", { referencedTable: "series", ascending: true, nullsFirst: false })
-    .order("position_in_series", { ascending: true, nullsFirst: false })
-    .order("title", { ascending: true })
-    .range(from, to);
+    `);
 
   if (searchQuery) {
     query = query.ilike("title", `%${searchQuery}%`);
   }
 
   const { data, error } = await query;
-
-  // Si se proporciona un bookId, buscar ese libro específico para el modal
-  let targetBook = null;
-  if (targetBookId) {
-    const { data: foundBook } = await supabase
-      .from("books")
-      .select(`
-        id,
-        title,
-        isbn,
-        year,
-        edition,
-        language,
-        pages,
-        description,
-        cover_url,
-        status,
-        position_in_series,
-        publishers (name),
-        series (name),
-        shelf_modules (name),
-        book_authors (authors (name)),
-        book_genres (genres (name))
-      `)
-      .eq('id', targetBookId)
-      .single();
-
-    targetBook = foundBook;
-  }
 
   if (error) {
     return (
@@ -102,13 +70,94 @@ export default async function BooksPage({
     );
   }
 
-  const books = data as unknown as FullBook[];
+  let allBooks = (data as unknown as FullBook[]) || [];
 
-  // Helper para mantener los parámetros actuales en los links de paginación
+  // 1. APLICAR FILTROS EN EL SERVIDOR (sobre el total de libros)
+  if (selectedSeries.length > 0) {
+    allBooks = allBooks.filter(b => b.series?.name && selectedSeries.includes(b.series.name));
+  }
+  if (selectedPublishers.length > 0) {
+    allBooks = allBooks.filter(b => b.publishers?.name && selectedPublishers.includes(b.publishers.name));
+  }
+  if (selectedModules.length > 0) {
+    allBooks = allBooks.filter(b => b.shelf_modules?.name && selectedModules.includes(b.shelf_modules.name));
+  }
+  if (selectedAuthors.length > 0) {
+    allBooks = allBooks.filter(b => {
+      const authors = b.book_authors.map(ba => ba.authors?.name).filter(Boolean);
+      return selectedAuthors.some(a => authors.includes(a));
+    });
+  }
+  if (selectedGenres.length > 0) {
+    allBooks = allBooks.filter(b => {
+      const genres = b.book_genres.map(bg => bg.genres?.name).filter(Boolean);
+      return selectedGenres.some(g => genres.includes(g));
+    });
+  }
+
+  // 2. ORDENACIÓN JERÁRQUICA GLOBAL EN EL SERVIDOR
+  // Criterio: Módulo > Saga > Posición en saga > Título
+  allBooks.sort((a, b) => {
+    // A. Módulo (Los asignados van primero, los null al final)
+    const modA = a.shelf_modules?.name || '';
+    const modB = b.shelf_modules?.name || '';
+    if (modA !== modB) {
+      if (!modA) return 1;
+      if (!modB) return -1;
+      return modA.localeCompare(modB);
+    }
+
+    // B. Saga (Los asignados van primero, los null al final)
+    const seriesA = a.series?.name || '';
+    const seriesB = b.series?.name || '';
+    if (seriesA !== seriesB) {
+      if (!seriesA) return 1;
+      if (!seriesB) return -1;
+      return seriesA.localeCompare(seriesB);
+    }
+
+    // C. Posición en la saga (Numérica ascendente, nulls al final)
+    const posA = a.position_in_series ?? 999999;
+    const posB = b.position_in_series ?? 999999;
+    if (posA !== posB) {
+      return posA - posB;
+    }
+
+    // D. Título alfabéticamente
+    return (a.title || '').localeCompare(b.title || '');
+  });
+
+  // 3. PAGINACIÓN GLOBAL
+  const totalBooks = allBooks.length;
+  const totalPages = Math.ceil(totalBooks / PAGE_SIZE) || 1;
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const paginatedBooks = allBooks.slice(startIndex, startIndex + PAGE_SIZE);
+
+  // Búsqueda de libro específico para el modal
+  let targetBook = null;
+  if (targetBookId) {
+    const { data: foundBook } = await supabase
+      .from("books")
+      .select(`
+        id, title, isbn, year, edition, language, pages, description, cover_url, status, position_in_series,
+        publishers (name), series (name), shelf_modules (name),
+        book_authors (authors (name)), book_genres (genres (name))
+      `)
+      .eq('id', targetBookId)
+      .single();
+    targetBook = foundBook;
+  }
+
+  // Helper para mantener los parámetros en los enlaces de paginación
   const createPageUrl = (pageNumber: number) => {
     const p = new URLSearchParams();
     if (pageNumber > 1) p.set("page", pageNumber.toString());
     if (searchQuery) p.set("q", searchQuery);
+    if (params?.series) p.set("series", params.series);
+    if (params?.author) p.set("author", params.author);
+    if (params?.genre) p.set("genre", params.genre);
+    if (params?.publisher) p.set("publisher", params.publisher);
+    if (params?.module) p.set("module", params.module);
     if (targetBookId) p.set("bookId", targetBookId);
     const str = p.toString();
     return `/books${str ? `?${str}` : ""}`;
@@ -119,7 +168,7 @@ export default async function BooksPage({
       <div className="max-w-7xl mx-auto">
             
         <BooksClient 
-          books={(books as FullBook[]) || []} 
+          books={paginatedBooks} 
           targetBook={targetBook as unknown as FullBook | null} 
           initialQuery={searchQuery}
         />
@@ -127,7 +176,6 @@ export default async function BooksPage({
         {/* Controles de paginación */}
         {totalPages > 1 && (
           <div className="flex justify-between items-center mt-12 bg-white px-6 py-4 rounded-xl border border-gray-200 shadow-sm">
-            
             {currentPage > 1 ? (
               <Link
                 href={createPageUrl(currentPage - 1)}
@@ -158,7 +206,6 @@ export default async function BooksPage({
                 Siguiente <ChevronRight className="w-4 h-4" />
               </span>
             )}
-
           </div>
         )}
 

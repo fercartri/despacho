@@ -39,21 +39,28 @@ export default function BooksClient({
   const [searchQuery, setSearchQuery] = useState(initialQuery)
   const [isPending, startTransition] = useTransition()
   
-  // Estado para el panel de filtros desplegable
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-
-  // Estados de filtros seleccionados (arrays con nombres únicos)
-  const [selectedAuthors, setSelectedAuthors] = useState<string[]>([])
-  const [selectedPublishers, setSelectedPublishers] = useState<string[]>([])
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([])
-  const [selectedSeries, setSelectedSeries] = useState<string[]>([])
-  const [selectedModules, setSelectedModules] = useState<string[]>([])
-
-  // Estado para controlar qué desplegable de categoría está abierto dentro del panel
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
 
   const searchParams = useSearchParams()
   const router = useRouter()
+
+  // Inicializamos los estados de los filtros leyendo directamente de la URL
+  const [selectedAuthors, setSelectedAuthors] = useState<string[]>(
+    searchParams.get('author') ? searchParams.get('author')!.split(',') : []
+  )
+  const [selectedPublishers, setSelectedPublishers] = useState<string[]>(
+    searchParams.get('publisher') ? searchParams.get('publisher')!.split(',') : []
+  )
+  const [selectedGenres, setSelectedGenres] = useState<string[]>(
+    searchParams.get('genre') ? searchParams.get('genre')!.split(',') : []
+  )
+  const [selectedSeries, setSelectedSeries] = useState<string[]>(
+    searchParams.get('series') ? searchParams.get('series')!.split(',') : []
+  )
+  const [selectedModules, setSelectedModules] = useState<string[]>(
+    searchParams.get('module') ? searchParams.get('module')!.split(',') : []
+  )
 
   useEffect(() => {
     if (targetBook) {
@@ -84,6 +91,38 @@ export default function BooksClient({
     closeModal()
   }
 
+  // Función centralizada para actualizar la URL con los nuevos filtros y reiniciar a la página 1
+  const updateUrlFilters = (updatedFilters: {
+    author?: string[];
+    publisher?: string[];
+    genre?: string[];
+    series?: string[];
+    module?: string[];
+  }) => {
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('page', '1'); // Resetear a página 1 al filtrar
+
+      const filtersMap = {
+        author: updatedFilters.author ?? selectedAuthors,
+        publisher: updatedFilters.publisher ?? selectedPublishers,
+        genre: updatedFilters.genre ?? selectedGenres,
+        series: updatedFilters.series ?? selectedSeries,
+        module: updatedFilters.module ?? selectedModules,
+      };
+
+      Object.entries(filtersMap).forEach(([key, values]) => {
+        if (values.length > 0) {
+          params.set(key, values.join(','));
+        } else {
+          params.delete(key);
+        }
+      });
+
+      router.replace(`/books${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false });
+    });
+  }
+
   // Manejador de la barra de búsqueda por título
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -101,64 +140,26 @@ export default function BooksClient({
     });
   }
 
-  // --- OBTENER LISTAS ÚNICAS DE FILTROS A PARTIR DE LOS LIBROS CARGADOS ---
+  // Listas de opciones para los desplegables (basadas en los libros actuales de la página)
   const allAuthors = Array.from(new Set(books.flatMap(b => b.book_authors.map(ba => ba.authors?.name).filter(Boolean)))) as string[];
   const allPublishers = Array.from(new Set(books.map(b => b.publishers?.name).filter(Boolean))) as string[];
   const allGenres = Array.from(new Set(books.flatMap(b => b.book_genres.map(bg => bg.genres?.name).filter(Boolean)))) as string[];
   const allSeries = Array.from(new Set(books.map(b => b.series?.name).filter(Boolean))) as string[];
   const allModules = Array.from(new Set(books.map(b => b.shelf_modules?.name).filter(Boolean))) as string[];
 
-  // --- LÓGICA DE FILTRADO COMBINADO ---
-  const filteredBooks = books.filter(book => {
-    // 1. Filtro de búsqueda por título
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const title = (book.title || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      if (!title.includes(query)) return false;
-    }
-
-    // 2. Filtro por Autores
-    if (selectedAuthors.length > 0) {
-      const bookAuthorNames = book.book_authors.map(ba => ba.authors?.name).filter(Boolean);
-      const matches = selectedAuthors.some(author => bookAuthorNames.includes(author));
-      if (!matches) return false;
-    }
-
-    // 3. Filtro por Editoriales
-    if (selectedPublishers.length > 0) {
-      const pubName = book.publishers?.name;
-      if (!pubName || !selectedPublishers.includes(pubName)) return false;
-    }
-
-    // 4. Filtro por Géneros
-    if (selectedGenres.length > 0) {
-      const bookGenreNames = book.book_genres.map(bg => bg.genres?.name).filter(Boolean);
-      const matches = selectedGenres.some(genre => bookGenreNames.includes(genre));
-      if (!matches) return false;
-    }
-
-    // 5. Filtro por Sagas
-    if (selectedSeries.length > 0) {
-      const seriesName = book.series?.name;
-      if (!seriesName || !selectedSeries.includes(seriesName)) return false;
-    }
-
-    // 6. Filtro por Módulos
-    if (selectedModules.length > 0) {
-      const moduleName = book.shelf_modules?.name;
-      if (!moduleName || !selectedModules.includes(moduleName)) return false;
-    }
-
-    return true;
-  });
-
-  // Funciones de selección de checkboxes
-  const toggleFilterItem = (list: string[], setList: (val: string[]) => void, item: string) => {
-    if (list.includes(item)) {
-      setList(list.filter(i => i !== item));
-    } else {
-      setList([...list, item]);
-    }
+  // Funciones de selección de checkboxes que actualizan el estado y sincronizan la URL
+  const toggleFilterItem = (
+    item: string, 
+    list: string[], 
+    setList: (val: string[]) => void, 
+    filterKey: 'author' | 'publisher' | 'genre' | 'series' | 'module'
+  ) => {
+    const updatedList = list.includes(item) 
+      ? list.filter(i => i !== item) 
+      : [...list, item];
+    
+    setList(updatedList);
+    updateUrlFilters({ [filterKey]: updatedList });
   };
 
   const resetAllFilters = () => {
@@ -167,6 +168,12 @@ export default function BooksClient({
     setSelectedGenres([]);
     setSelectedSeries([]);
     setSelectedModules([]);
+
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      ['author', 'publisher', 'genre', 'series', 'module'].forEach(k => params.delete(k));
+      router.replace(`/books${params.toString() ? `?${params.toString()}` : ''}`, { scroll: false });
+    });
   };
 
   const activeFiltersCount = selectedAuthors.length + selectedPublishers.length + selectedGenres.length + selectedSeries.length + selectedModules.length;
@@ -261,7 +268,7 @@ export default function BooksClient({
                       <input
                         type="checkbox"
                         checked={selectedAuthors.includes(author)}
-                        onChange={() => toggleFilterItem(selectedAuthors, setSelectedAuthors, author)}
+                        onChange={() => toggleFilterItem(author, selectedAuthors, setSelectedAuthors, 'author')}
                         className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
                       />
                       <span className="truncate">{author}</span>
@@ -288,7 +295,7 @@ export default function BooksClient({
                       <input
                         type="checkbox"
                         checked={selectedPublishers.includes(pub)}
-                        onChange={() => toggleFilterItem(selectedPublishers, setSelectedPublishers, pub)}
+                        onChange={() => toggleFilterItem(pub, selectedPublishers, setSelectedPublishers, 'publisher')}
                         className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
                       />
                       <span className="truncate">{pub}</span>
@@ -315,7 +322,7 @@ export default function BooksClient({
                       <input
                         type="checkbox"
                         checked={selectedGenres.includes(genre)}
-                        onChange={() => toggleFilterItem(selectedGenres, setSelectedGenres, genre)}
+                        onChange={() => toggleFilterItem(genre, selectedGenres, setSelectedGenres, 'genre')}
                         className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
                       />
                       <span className="truncate">{genre}</span>
@@ -342,7 +349,7 @@ export default function BooksClient({
                       <input
                         type="checkbox"
                         checked={selectedSeries.includes(series)}
-                        onChange={() => toggleFilterItem(selectedSeries, setSelectedSeries, series)}
+                        onChange={() => toggleFilterItem(series, selectedSeries, setSelectedSeries, 'series')}
                         className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
                       />
                       <span className="truncate">{series}</span>
@@ -369,7 +376,7 @@ export default function BooksClient({
                       <input
                         type="checkbox"
                         checked={selectedModules.includes(module)}
-                        onChange={() => toggleFilterItem(selectedModules, setSelectedModules, module)}
+                        onChange={() => toggleFilterItem(module, selectedModules, setSelectedModules, 'module')}
                         className="rounded border-gray-300 text-gray-900 focus:ring-gray-900 w-3.5 h-3.5"
                       />
                       <span className="truncate">{module}</span>
@@ -384,9 +391,9 @@ export default function BooksClient({
         </div>
       )}
 
-      {/* LISTA PRINCIPAL (Grid de tarjetas resumen) */}
+      {/* LISTA PRINCIPAL (Grid de tarjetas resumen con los libros ya filtrados y ordenados desde el servidor) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredBooks.map((book) => {
+        {books.map((book) => {
           const authorNames = book.book_authors
             .map(ba => ba.authors?.name)
             .filter(Boolean)
@@ -448,7 +455,7 @@ export default function BooksClient({
         })}
       </div>
 
-      {filteredBooks.length === 0 && (
+      {books.length === 0 && (
         <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4 shadow-sm">
           <p className="text-gray-500">No se ha encontrado ningún libro con los filtros seleccionados</p>
         </div>
