@@ -20,6 +20,7 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
   const [search, setSearch] = useState('')
   const [selectedOption, setSelectedOption] = useState<Option | null>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -35,6 +36,11 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
     opt.name.toLowerCase().includes(search.toLowerCase())
   )
 
+  // Resetear el índice resaltado al escribir o buscar
+  useEffect(() => {
+    setHighlightedIndex(0)
+  }, [search])
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -49,13 +55,44 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
     setSelectedOption(opt)
     setSearch('')
     setIsOpen(false)
-    if (onChange) onChange(opt) // Avisamos al formulario
+    setHighlightedIndex(0)
+    if (onChange) onChange(opt)
   }
 
   const handleClear = () => {
     setSelectedOption(null)
     setSearch('')
-    if (onChange) onChange(null) // Avisamos de que se ha borrado
+    if (onChange) onChange(null)
+  }
+
+  // Manejo de eventos de teclado (Flechas y Enter)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      setIsOpen(true)
+      e.preventDefault()
+      return
+    }
+
+    if (!isOpen) return
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlightedIndex(prev => 
+        prev < filteredOptions.length - 1 ? prev + 1 : 0
+      )
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlightedIndex(prev => 
+        prev > 0 ? prev - 1 : filteredOptions.length - 1
+      )
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      if (filteredOptions[highlightedIndex]) {
+        handleSelect(filteredOptions[highlightedIndex])
+      }
+    } else if (e.key === 'Escape') {
+      setIsOpen(false)
+    }
   }
 
   return (
@@ -78,12 +115,13 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
           <input
             type="text"
             value={search}
-            required={required} // Si es obligatorio, el navegador pedirá rellenar este campo
+            required={required}
             onChange={(e) => {
               setSearch(e.target.value)
               setIsOpen(true)
             }}
             onFocus={() => setIsOpen(true)}
+            onKeyDown={handleKeyDown}
             placeholder={placeholder}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800 text-black pr-10 bg-white shadow-sm"
           />
@@ -102,15 +140,21 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
       {isOpen && !selectedOption && (
         <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredOptions.length > 0 ? (
-            filteredOptions.map(opt => (
-              <li 
-                key={opt.id}
-                onClick={() => handleSelect(opt)}
-                className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-gray-800 border-b border-gray-50 last:border-0"
-              >
-                {opt.name}
-              </li>
-            ))
+            filteredOptions.map((opt, index) => {
+              const isHighlighted = index === highlightedIndex
+              return (
+                <li 
+                  key={opt.id}
+                  onClick={() => handleSelect(opt)}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  className={`px-4 py-2 cursor-pointer border-b border-gray-50 last:border-0 transition-colors ${
+                    isHighlighted ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-800 hover:bg-gray-50'
+                  }`}
+                >
+                  {opt.name}
+                </li>
+              )
+            })
           ) : (
             <li className="px-4 py-3 text-gray-500 text-sm italic text-center bg-gray-50">
               No se encontraron resultados
