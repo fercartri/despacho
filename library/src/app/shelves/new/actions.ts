@@ -25,5 +25,5 @@ export async function createShelf(formData: FormData) {
   }
 
   // Si todo va bien, redirigimos al listado de módulos
-  redirect('/shelf_modules')
+  redirect('/shelves')
 }
