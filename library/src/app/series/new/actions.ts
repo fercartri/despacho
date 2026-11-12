@@ -19,7 +19,7 @@ export async function createSerie(formData: FormData) {
   if (error) {
     // Si el código de error es de duplicado en PostgreSQL (23505) o similar
     if (error.code === '23505' || error.message.includes('duplicate')) {
-      return { error: 'Esta serie ya existe en la base de datos' }
+      return { error: 'Esta saga ya existe en la base de datos' }
     }
     return { error: error.message }
   }
