@@ -19,7 +19,7 @@ export async function createAuthor(formData: FormData) {
   if (error) {
     // Si el código de error es de duplicado en PostgreSQL (23505) o similar
     if (error.code === '23505' || error.message.includes('duplicate')) {
-      return { error: 'Este autor ya existe en la base de datos.' }
+      return { error: 'Este autor ya existe en la base de datos' }
     }
     return { error: error.message }
   }
