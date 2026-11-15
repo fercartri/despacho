@@ -6,6 +6,7 @@ import ActionButtons from '@/components/ActionButtons'
 import { deleteAuthor } from '@/app/actions/delete'
 import { AuthorAvatar } from '@/components/EntityIcons'
 import { ChevronDown, Eye } from 'lucide-react'
+import AlphabetNav from '@/components/AlphabetNav'
 
 type Book = {
   id: string
@@ -34,10 +35,29 @@ export default function AuthorsAccordion({ authorsList }: { authorsList: AuthorW
     return null
   }
 
+  // Control para marcar solo la primera vez que aparece una letra
+  const seenLetters = new Set<string>()
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Barra del abecedario arriba del todo */}
+      <AlphabetNav items={authorsList} />
+
       {authorsList.map((author) => {
         const isExpanded = expanded[author.id]
+
+        // Normalizamos la primera letra del nombre (ej: "Á" -> "A")
+        const normalizedLetter = author.name
+          .trim()
+          .charAt(0)
+          .toUpperCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+
+        const isFirstOfLetter = !seenLetters.has(normalizedLetter)
+        if (isFirstOfLetter) {
+          seenLetters.add(normalizedLetter)
+        }
         
         // Extraemos los libros válidos de la tabla intermedia y los ordenamos por título
         const books = author.book_authors
@@ -46,7 +66,12 @@ export default function AuthorsAccordion({ authorsList }: { authorsList: AuthorW
           .sort((a, b) => a.title.localeCompare(b.title))
 
         return (
-          <div key={author.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/author transition-all">
+          <div 
+            key={author.id} 
+            // Asignamos el ID ancla solo al primer elemento de cada letra
+            id={isFirstOfLetter ? `anchor-letter-${normalizedLetter}` : undefined}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/author transition-all scroll-mt-24"
+          >
             
             {/* CABECERA */}
             <div 
