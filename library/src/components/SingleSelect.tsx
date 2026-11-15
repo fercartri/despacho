@@ -71,7 +71,8 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
     if (onChange) onChange(opt)
   }
 
-  const handleClear = () => {
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setSelectedOption(null)
     setSearch('')
     if (onChange) onChange(null)
@@ -110,60 +111,57 @@ export default function SingleSelect({ options, name, placeholder = "Buscar...",
     <div className="relative w-full" ref={wrapperRef}>
       <input type="hidden" name={name} value={selectedOption ? selectedOption.id : ''} />
 
-      {selectedOption ? (
-        <div className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 shadow-sm">
-          <span className="truncate font-medium">{selectedOption.name}</span>
-          <button 
-            type="button" 
-            onClick={handleClear}
-            className="text-gray-400 hover:text-red-600 font-bold ml-2 focus:outline-none transition-colors"
-          >
-            ✕
-          </button>
-        </div>
-      ) : (
-        <div className="relative">
-          <input
-            type="text"
-            value={search}
-            required={required}
-            onChange={(e) => {
-              setSearch(e.target.value)
-              setIsOpen(true)
-            }}
-            onFocus={() => setIsOpen(true)}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800 text-black pr-10 bg-white shadow-sm"
-          />
-          {search && (
+      {/* Input principal siempre visible que actúa tanto como buscador como contenedor del seleccionado */}
+      <div className="relative">
+        <input
+          type="text"
+          value={search}
+          required={required && !selectedOption}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setIsOpen(true)
+          }}
+          onFocus={() => setIsOpen(true)}
+          onKeyDown={handleKeyDown}
+          placeholder={selectedOption ? selectedOption.name : placeholder}
+          className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-800 text-black pr-16 shadow-sm ${
+            selectedOption && !search ? 'bg-gray-50 font-medium placeholder:text-gray-900' : 'bg-white'
+          }`}
+        />
+
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          {selectedOption && (
             <button
               type="button"
-              onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 font-bold"
+              onClick={handleClear}
+              className="text-gray-400 hover:text-red-600 font-bold px-1 text-sm transition-colors"
+              title="Quitar selección"
             >
               ✕
             </button>
           )}
         </div>
-      )}
+      </div>
 
-      {isOpen && !selectedOption && (
+      {/* Lista desplegable abierta siempre que isOpen sea true */}
+      {isOpen && (
         <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((opt, index) => {
               const isHighlighted = index === highlightedIndex
+              const isSelected = selectedOption?.id === opt.id
               return (
                 <li 
                   key={opt.id}
                   ref={(el) => { itemRefs.current[index] = el }}
                   onClick={() => handleSelect(opt)}
                   onMouseEnter={() => setHighlightedIndex(index)}
-                  className={`px-4 py-2 cursor-pointer border-b border-gray-50 last:border-0 transition-colors ${
+                  className={`px-4 py-2 cursor-pointer border-b border-gray-50 last:border-0 transition-colors flex justify-between items-center ${
                     isHighlighted ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-800 hover:bg-gray-50'
-                  }`}
+                  } ${isSelected ? 'bg-indigo-50/60 font-semibold text-indigo-900' : ''}`}
                 >
-                  {opt.name}
+                  <span>{opt.name}</span>
+                  {isSelected && <span className="text-xs text-indigo-600 font-bold">Seleccionado</span>}
                 </li>
               )
             })
