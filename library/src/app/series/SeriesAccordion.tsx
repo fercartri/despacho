@@ -6,6 +6,7 @@ import ActionButtons from '@/components/ActionButtons'
 import { deleteSeries } from '@/app/actions/delete'
 import { SeriesIcon } from '@/components/EntityIcons'
 import { ChevronDown, Eye } from 'lucide-react'
+import AlphabetNav from '@/components/AlphabetNav'
 
 type Book = {
   id: string
@@ -32,10 +33,29 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
     return null;
   }
 
+  // Control para marcar solo la primera vez que aparece una letra
+  const seenLetters = new Set<string>()
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Barra del abecedario arriba del todo */}
+      <AlphabetNav items={seriesList} />
+
       {seriesList.map((item) => {
         const isExpanded = expanded[item.id]
+
+        // Normalizamos la primera letra del nombre (ej: "Á" -> "A")
+        const normalizedLetter = item.name
+          .trim()
+          .charAt(0)
+          .toUpperCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+
+        const isFirstOfLetter = !seenLetters.has(normalizedLetter)
+        if (isFirstOfLetter) {
+          seenLetters.add(normalizedLetter)
+        }
         
         // Ordenamos los libros por su posición en la saga (los que no tienen número van al final)
         const sortedBooks = [...item.books].sort((a, b) => {
@@ -45,7 +65,12 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
         })
 
         return (
-          <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/series transition-all">
+          <div 
+            key={item.id} 
+            // Asignamos el ID ancla solo al primer elemento de cada letra
+            id={isFirstOfLetter ? `anchor-letter-${normalizedLetter}` : undefined}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/series transition-all scroll-mt-24"
+          >
             
             {/* CABECERA (Siempre visible) */}
             <div 

@@ -6,6 +6,7 @@ import ActionButtons from '@/components/ActionButtons'
 import { deleteGenre } from '@/app/actions/delete'
 import { GenreIcon } from '@/components/EntityIcons'
 import { ChevronDown, Eye } from 'lucide-react'
+import AlphabetNav from '@/components/AlphabetNav'
 
 type Book = {
   id: string
@@ -33,10 +34,29 @@ export default function GenresAccordion({ genresList }: { genresList: GenreWithB
     return null
   }
 
+  // Control para marcar solo la primera vez que aparece una letra
+  const seenLetters = new Set<string>()
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Barra del abecedario arriba del todo */}
+      <AlphabetNav items={genresList} />
+
       {genresList.map((genre) => {
         const isExpanded = expanded[genre.id]
+
+        // Normalizamos la primera letra del nombre (ej: "Á" -> "A")
+        const normalizedLetter = genre.name
+          .trim()
+          .charAt(0)
+          .toUpperCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+
+        const isFirstOfLetter = !seenLetters.has(normalizedLetter)
+        if (isFirstOfLetter) {
+          seenLetters.add(normalizedLetter)
+        }
         
         // Extraemos los libros válidos de la tabla intermedia y los ordenamos alfabéticamente por título
         const books = genre.book_genres
@@ -45,7 +65,12 @@ export default function GenresAccordion({ genresList }: { genresList: GenreWithB
           .sort((a, b) => a.title.localeCompare(b.title))
 
         return (
-          <div key={genre.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/genre transition-all">
+          <div 
+            key={genre.id} 
+            // Asignamos el ID ancla solo al primer elemento de cada letra
+            id={isFirstOfLetter ? `anchor-letter-${normalizedLetter}` : undefined}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/genre transition-all scroll-mt-24"
+          >
             
             {/* CABECERA */}
             <div 
@@ -93,7 +118,7 @@ export default function GenresAccordion({ genresList }: { genresList: GenreWithB
 
                       return (
                         <li key={book.id} className="flex justify-between items-center px-6 py-4 hover:bg-white transition-colors">
-                          
+
                           <div className="flex flex-col min-w-0 pr-4">
                             <span className="font-semibold text-gray-900 truncate">{book.title}</span>
                             <span className="text-sm text-gray-500 truncate mt-0.5">{authorNames}</span>
