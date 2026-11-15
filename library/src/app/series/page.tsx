@@ -9,16 +9,7 @@ export default async function SeriesPage() {
   // Pedimos las sagas y la información clave de cada libro
   const { data: series } = await supabase
     .from("series")
-    .select(`
-      id, 
-      name,
-      books ( 
-        id, 
-        title, 
-        status, 
-        position_in_series 
-      )
-    `)
+    .select(`id, name, books (id, title, status, position_in_series )`)
     .order("name");
 
   return (
