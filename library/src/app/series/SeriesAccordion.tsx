@@ -121,7 +121,7 @@ export default function SeriesAccordion({ seriesList }: { seriesList: Series[] }
                   </ul>
                 ) : (
                   <div className="p-6 text-center text-gray-500 italic text-sm">
-                    Todavía no hay libros registrados
+                    Todavía no hay libros registrados para esta serie
                   </div>
                 )}
               </div>

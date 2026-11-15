@@ -113,6 +113,7 @@ export default function AuthorsAccordion({ authorsList }: { authorsList: AuthorW
                   <ul className="divide-y divide-gray-100">
                     {books.map((book) => (
                       <li key={book.id} className="flex justify-between items-center px-6 py-4 hover:bg-white transition-colors">
+
                         <div className="flex flex-col min-w-0 pr-4">
                           <span className="font-semibold text-gray-900 truncate">{book.title}</span>
                           {book.series?.name && (
@@ -122,20 +123,23 @@ export default function AuthorsAccordion({ authorsList }: { authorsList: AuthorW
                           )}
                         </div>
                         
-                        <div className="flex items-center gap-4 flex-shrink-0">
+                        <div className="flex items-center gap-4">
+                          {/* Estado del libro */}
                           <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${
                             book.status === 'Disponible' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
                           }`}>
                             {book.status}
                           </span>
-                          <Link
+                          
+                          <Link 
                             href={`/books?bookId=${book.id}`}
-                            className="p-2 text-gray-900 hover:text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
+                            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
                             title="Ver detalles completos del libro"
                           >
                             <Eye className="w-4 h-4" />
                           </Link>
                         </div>
+                        
                       </li>
                     ))}
                   </ul>
