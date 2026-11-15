@@ -6,6 +6,7 @@ import ActionButtons from '@/components/ActionButtons'
 import { deletePublisher } from '@/app/actions/delete'
 import { PublisherIcon } from '@/components/EntityIcons'
 import { ChevronDown, Eye } from 'lucide-react'
+import AlphabetNav from '@/components/AlphabetNav'
 
 type Book = {
   id: string
@@ -31,15 +32,40 @@ export default function PublishersAccordion({ publishersList }: { publishersList
     return null
   }
 
+  // Control para marcar solo la primera vez que aparece una letra
+  const seenLetters = new Set<string>()
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Barra del abecedario arriba del todo */}
+      <AlphabetNav items={publishersList} />
+
       {publishersList.map((publisher) => {
         const isExpanded = expanded[publisher.id]
-        // Ordenamos alfabéticamente los libros dentro de la editorial
+
+        // Normalizamos la primera letra del nombre (ej: "Á" -> "A")
+        const normalizedLetter = publisher.name
+          .trim()
+          .charAt(0)
+          .toUpperCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+
+        const isFirstOfLetter = !seenLetters.has(normalizedLetter)
+        if (isFirstOfLetter) {
+          seenLetters.add(normalizedLetter)
+        }
+
+                // Ordenamos alfabéticamente los libros dentro de la editorial
         const sortedBooks = [...publisher.books].sort((a, b) => a.title.localeCompare(b.title))
 
         return (
-          <div key={publisher.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/publisher transition-all">
+          <div 
+            key={publisher.id} 
+            // Asignamos el ID ancla solo al primer elemento de cada letra
+            id={isFirstOfLetter ? `anchor-letter-${normalizedLetter}` : undefined}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group/publisher transition-all scroll-mt-24"
+          >
             
             {/* CABECERA */}
             <div 
@@ -87,25 +113,29 @@ export default function PublishersAccordion({ publishersList }: { publishersList
 
                       return (
                         <li key={book.id} className="flex justify-between items-center px-6 py-4 hover:bg-white transition-colors">
+                          
                           <div className="flex flex-col min-w-0 pr-4">
                             <span className="font-semibold text-gray-900 truncate">{book.title}</span>
                             <span className="text-sm text-gray-500 truncate mt-0.5">{authorNames}</span>
                           </div>
                           
-                          <div className="flex items-center gap-4 flex-shrink-0">
+                          <div className="flex items-center gap-4">
+                            {/* Estado del libro */}
                             <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${
                               book.status === 'Disponible' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
                             }`}>
                               {book.status}
                             </span>
-                            <Link
+                            
+                            <Link 
                               href={`/books?bookId=${book.id}`}
-                              className="p-2 text-gray-900 hover:text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
+                              className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
                               title="Ver detalles completos del libro"
                             >
                               <Eye className="w-4 h-4" />
                             </Link>
                           </div>
+
                         </li>
                       )
                     })}
