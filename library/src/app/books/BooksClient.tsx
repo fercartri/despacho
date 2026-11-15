@@ -6,6 +6,7 @@ import Link from 'next/link'
 import ActionButtons from '@/components/ActionButtons'
 import { deleteBook } from '@/app/actions/delete'
 import { Plus, MapPin, Tag, Library, X, Search, Loader2, SlidersHorizontal, ChevronDown } from 'lucide-react'
+import ExportDropdown from '@/components/ExportDropdown'
 
 export type FullBook = {
   id: string
@@ -184,11 +185,17 @@ export default function BooksClient({
   return (
     <div className="max-w-7xl mx-auto">
       {/* Cabecera unificada */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <header className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Libros</h1>
-        <Link href="/new-book" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1">
-          <Plus className="w-4 h-4" /> Nuevo libro
-        </Link>
+        
+        <div className="flex items-center gap-3">
+          {/* Menú desplegable de exportación */}
+          <ExportDropdown />
+
+          <Link href="/new-book" className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition font-medium shadow-sm flex items-center gap-1">
+            <Plus className="w-4 h-4" /> Nuevo libro
+          </Link>
+        </div>
       </header>
 
       {/* BARRA DE BÚSQUEDA Y BOTÓN DE FILTROS */}
