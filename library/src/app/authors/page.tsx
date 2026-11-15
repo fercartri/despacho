@@ -1,13 +1,28 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
-import ActionButtons from '@/components/ActionButtons'
-import { deleteAuthor } from '@/app/actions/delete'
-import { AuthorAvatar } from '@/components/EntityIcons'
+import AuthorsAccordion from "./AuthorsAccordion";
 import { Plus } from "lucide-react";
 
 export default async function AuthorsPage() {
   const supabase = await createClient();
-  const { data: authors } = await supabase.from("authors").select("*").order("name");
+  
+  // Traemos los autores y sus libros a través de la tabla intermedia book_authors
+  const { data: authors } = await supabase
+    .from("authors")
+    .select(`
+      id, 
+      name,
+      book_authors (
+        books (
+          id,
+          title,
+          status,
+          position_in_series,
+          series (name)
+        )
+      )
+    `)
+    .order("name");
 
   return (
     <main className="min-h-screen bg-gray-50 p-8 pb-16">
@@ -19,32 +34,10 @@ export default async function AuthorsPage() {
           </Link>
         </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {authors?.map((author) => (
-            <div key={author.id} className="group bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center hover:shadow-lg hover:border-gray-300 transition-all h-full">
-              
-              <div className="flex items-center gap-4 flex-1 min-w-0">
-                <AuthorAvatar name={author.name}/>
-                <h2 className="font-semibold text-gray-900 break-words">
-                  {author.name}
-                </h2>
-              </div>
-              
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-3">
-                <ActionButtons 
-                  id={author.id} 
-                  editUrl={`/authors/${author.id}/edit`} 
-                  deleteAction={deleteAuthor}
-                  confirmMessage={`¿Seguro que quieres borrar a "${author.name}"?`}
-                />
-              </div>
-
-            </div>
-          ))}
-        </div>
+        <AuthorsAccordion authorsList={(authors as unknown as any[]) || []} />
 
         {authors?.length === 0 && (
-          <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4">
+          <div className="text-center bg-white rounded-lg border border-gray-200 p-12 mt-4 shadow-sm">
             <p className="text-gray-500">Todavía no hay autores registrados</p>
           </div>
         )}
